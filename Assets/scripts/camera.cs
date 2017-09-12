@@ -38,14 +38,14 @@ public class camera : MonoBehaviour {
 			rsXInput += (invertX ? -1 : 1) * XCI.GetAxis (XboxAxis.RightStickX, (XboxController)i);
 			rsYInput += (invertY ? 1 : -1) * XCI.GetAxis (XboxAxis.RightStickY, (XboxController)i);
 		}
-
 		transform.LookAt(middle);
+		transform.RotateAround (middle, rsXInput * Vector3.up, Time.deltaTime * camSpeed * Mathf.Abs(rsXInput));
 		if (transform.rotation.eulerAngles.x < 88) {
-			transform.RotateAround (middle, (rsXInput * Vector3.up + rsYInput * transform.right), Time.deltaTime * camSpeed);
+			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		} else if (transform.rotation.eulerAngles.x > 88 && transform.rotation.eulerAngles.x < 270 && rsYInput <= 0) {
-			transform.RotateAround (middle, (rsXInput * Vector3.up + rsYInput * transform.right), Time.deltaTime * camSpeed);
+			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		} else if (transform.rotation.eulerAngles.x > 270 && rsYInput >= 0) {
-			transform.RotateAround (middle, (rsXInput * Vector3.up + rsYInput * transform.right), Time.deltaTime * camSpeed);
+			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		}
 
 		//zoom out
