@@ -4,19 +4,31 @@ using UnityEngine;
 
 public class Test : MonoBehaviour {
 
+	// hier wird nur getestet
+
 	void Start () {
+		
 		// print(queue.to_array());
-		Action_Q queue = new Action_Q();
-		queue.print_queue();
+		Action_Q q = new Action_Q();
+		q.print_queue();
 		
 		Action walk = new Action("walk", 0.2f);
 		Action stab = new Action("stab", 3.0f);
-		queue.enqueue(walk, 0.5f);
-		queue.print_queue();
-		queue.enqueue(stab, 2.8f);
-		queue.print_queue();
+		q.enqueue(walk, 0.5f);
+		q.print_queue();
+		q.enqueue(stab, 2.8f);
+		q.print_queue();
+		
+		print (q.fall_back());
+		q.print_queue();
+		
+		q.enqueue(stab, 2.8f);
+		q.print_queue();
+		
+		print (q.dequeue().get_name());
+		q.print_queue();
+		print (q.dequeue().get_name());
+		q.print_queue();
 
 	}
-
-
 }

@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Action {
 
-	private string name {get; set;}
+	// von dieser klasse werden alle aktionen (z.b. laufen, schießen, ausweichen, kitzeln, pupsen) erben
 
-	public Action (string name) {
+	private string name;					
+	private float time;						// execution time
+
+	public Action (string name, float time) {
 		this.name = name;
+		this.time = time;
 	}
-
-
+	public string get_name () {return name;}
+	public float get_time () {return time;}
 }
