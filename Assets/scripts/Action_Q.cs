@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class Action_Q {
 
-	// nur ein billiges tupel
 	public class Pair{
 		public Action action = null;
 		public float time = 0f;
 		public Pair (Action action, float time) { this.time = time; this. action = action; }
 	}
 
-	// nur ein billiger knoten
 	public class Node {
 		public Pair value = null;
 		public Node next = null;
@@ -19,7 +17,6 @@ public class Action_Q {
 		public Node (Pair value) { this.value = value; }
 	}
 
-	// nur eine billige liste
 	public class Listilist {
 		public Node head = null;
 		public Node tail = null;
