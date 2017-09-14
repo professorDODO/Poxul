@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XboxCtrlrInput;
 
-public class movement : MonoBehaviour {
+public class Movement : MonoBehaviour {
 
 	private Rigidbody rb;
 	public float playerIndex;

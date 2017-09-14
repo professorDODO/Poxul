@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XboxCtrlrInput;
 
-public class camera : MonoBehaviour {
+public class MainCamera : MonoBehaviour {
 
 	public Transform P;
 	public bool invertX;
@@ -23,9 +23,12 @@ public class camera : MonoBehaviour {
 
 	void Update() {
 		//position of players
-		Vector3[] pLoc = new Vector3[P.childCount];
+		int childCount = transform.parent.GetComponent<MiddleLoc>().childCount(P);
+		Vector3[] pLoc = new Vector3[childCount];
 		for (int i = 0; i < P.childCount; ++i) {
-			pLoc[i] = P.GetChild(i).position;
+			if (P.GetChild (i).gameObject.activeSelf) {
+				pLoc [i] = P.GetChild (i).position;
+			}
 		}
 		// midpos of all Players
 		Vector3 middle = transform.parent.position;
@@ -34,7 +37,6 @@ public class camera : MonoBehaviour {
 		float rsXInput = 0;
 		float rsYInput = 0;
 		for(int i = 1; i <= pLoc.Length; i++) {
-			
 			rsXInput += (invertX ? -1 : 1) * XCI.GetAxis (XboxAxis.RightStickX, (XboxController)i);
 			rsYInput += (invertY ? 1 : -1) * XCI.GetAxis (XboxAxis.RightStickY, (XboxController)i);
 		}
@@ -62,12 +64,12 @@ public class camera : MonoBehaviour {
 		//zoom in
 		float maxAngle = 0;
 		int playerMaxAngleIndex = -1;
-		for (int i = 0; i < P.childCount; ++i) {
+		for (int i = 0; i < pLoc.Length; ++i) {
 			if (Vector3.Angle ((pLoc [i] - transform.position), (middle - transform.position)) > maxAngle) {
 				maxAngle = Vector3.Angle ((pLoc [i] - transform.position), (middle - transform.position));
 				playerMaxAngleIndex = i;
 			}
-			if (P.childCount == 1) playerMaxAngleIndex = 0;
+			if (pLoc.Length == 1) playerMaxAngleIndex = 0;
 		}
 		if (maxAngle < FoVZoomIn) {
 			transform.LookAt (middle);
