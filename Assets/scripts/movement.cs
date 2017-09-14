@@ -14,8 +14,7 @@ public class Movement : MonoBehaviour {
 	void Awake() {
 		rb = GetComponent<Rigidbody>();
 	}
-
-
+		
 	void Update() {
 		Vector3 forwardDir = new Vector3 (Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
 		Vector3 rightDir = new Vector3 (Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;

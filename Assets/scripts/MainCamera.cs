@@ -5,7 +5,7 @@ using XboxCtrlrInput;
 
 public class MainCamera : MonoBehaviour {
 
-	public Transform P;
+	public Transform Player;
 	public bool invertX;
 	public bool invertY;
 	public float camZoomAccuracy;
@@ -23,13 +23,7 @@ public class MainCamera : MonoBehaviour {
 
 	void Update() {
 		//position of players
-		int childCount = transform.parent.GetComponent<MiddleLoc>().childCount(P);
-		Vector3[] pLoc = new Vector3[childCount];
-		for (int i = 0; i < P.childCount; ++i) {
-			if (P.GetChild (i).gameObject.activeSelf) {
-				pLoc [i] = P.GetChild (i).position;
-			}
-		}
+		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
 		// midpos of all Players
 		Vector3 middle = transform.parent.position;
 
