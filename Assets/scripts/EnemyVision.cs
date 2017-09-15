@@ -14,9 +14,9 @@ public class EnemyVision : MonoBehaviour {
 			float vertical = AngleInPlane(transform, pLoc[i], transform.right);
 			float horizontal = AngleInPlane(transform, pLoc[i], transform.up);
 			if (vertical <= fovVer/2 && horizontal <= fovHor/2) {
-				Debug.Log (string.Format("Player{0} is seen", i + 1));
+				//Debug.Log (string.Format("Player{0} is seen", i + 1));
 			} else {
-				Debug.Log (string.Format("Player{0} is not seen", i + 1));
+				//Debug.Log (string.Format("Player{0} is not seen", i + 1));
 			}
 		}
 	}
