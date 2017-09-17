@@ -7,16 +7,23 @@ public class EnemyVision : MonoBehaviour {
 	public float fovHor = 70;
 	public float fovVer	= 50;
 	public float viewRange = 10;
-	// Update is called once per frame
+
 	void Update () {
 		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
 		for (int i = 0; i < pLoc.Length; i++) {
 			float vertical = AngleInPlane(transform, pLoc[i], transform.right);
 			float horizontal = AngleInPlane(transform, pLoc[i], transform.up);
 			if (vertical <= fovVer/2 && horizontal <= fovHor/2) {
-				//Debug.Log (string.Format("Player{0} is seen", i + 1));
+				RaycastHit hit;
+				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
+					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
+						Debug.Log (string.Format ("Player{0} is seen", i + 1));
+					} else {
+						Debug.Log (string.Format ("Player{0} is not seen", i + 1));
+					}
+				}
 			} else {
-				//Debug.Log (string.Format("Player{0} is not seen", i + 1));
+				Debug.Log (string.Format("Player{0} is not seen", i + 1));
 			}
 		}
 	}
