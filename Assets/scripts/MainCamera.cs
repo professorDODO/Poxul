@@ -25,7 +25,7 @@ public class MainCamera : MonoBehaviour {
 		fovVerZoomOut = Camera.main.fieldOfView/Camera.main.aspect * (1 - zoomOutOffset);
 	}
 
-	void Update() {
+	void LateUpdate() {
 		//position of players
 		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
 		// midpos of all Players

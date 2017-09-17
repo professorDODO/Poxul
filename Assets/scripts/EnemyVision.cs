@@ -17,13 +17,13 @@ public class EnemyVision : MonoBehaviour {
 				RaycastHit hit;
 				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						Debug.Log (string.Format ("Player{0} is seen", i + 1));
+						//Debug.Log (string.Format ("Player{0} is seen", i + 1));
 					} else {
-						Debug.Log (string.Format ("Player{0} is not seen", i + 1));
+						//Debug.Log (string.Format ("Player{0} is not seen", i + 1));
 					}
 				}
 			} else {
-				Debug.Log (string.Format("Player{0} is not seen", i + 1));
+				//Debug.Log (string.Format("Player{0} is not seen", i + 1));
 			}
 		}
 	}
