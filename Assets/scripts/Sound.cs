@@ -8,17 +8,17 @@ public class Sound : MonoBehaviour {
 	private Rigidbody rb;
 	private AudioSource audio;
 
-	void Start()
+	void Awake()
 	{
 		audio = GetComponent<AudioSource>();
 		rb = GetComponent<Rigidbody>();
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
 		if (!audio.isPlaying) {
 				audio.Play ();
 		}
+		// percentage of Speed influences the sound volume
 		audio.volume = Mathf.Pow((rb.velocity.x + rb.velocity.z) / GetComponent<Movement>().maxSpeed, soundPow);
 	}
 }

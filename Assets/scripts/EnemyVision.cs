@@ -16,30 +16,33 @@ public class EnemyVision : MonoBehaviour {
 			float horizontal = AngleInPlane(transform, pLoc[i], transform.up);
 			if (vertical <= fovVer/2 && horizontal <= fovHor/2) {
 				RaycastHit hit;
+				// if there is any colider in the way to the player, the gameObject looks at the player
 				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						lookAt(pLoc[i], lookAroundSpeed);
+						lookAt(pLoc[i]);
 					}
 				}
 			}
 		}
 	}
 
+	// angles relative to a plane
 	public float AngleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
 		Vector3 dir = to - from.position;
 		Vector3 p1 = Project(dir, planeNormal);
 		Vector3 p2 = Project(from.forward, planeNormal);
 		return Vector3.Angle(p1, p2);
 	}
-
 	public Vector3 Project(Vector3 v, Vector3 onto) {
 		return v - (Vector3.Dot(v, onto) / Vector3.Dot(onto, onto)) * onto;
 	}
 
-	public void lookAt(Vector3 dir, float speed){
-		transform.parent.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir - transform.position), Time.deltaTime * speed);
+	// rotates the gameObject towards
+	public void lookAt(Vector3 dir){
+		transform.parent.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir - transform.position), Time.deltaTime * lookAroundSpeed);
 	}
 
+	// enables the ability to see the fov of the gameObject
 	void OnDrawGizmosSelected() {
 		Quaternion leftRayRotation = Quaternion.AngleAxis(-fovHor/2, transform.up);
 		Quaternion rightRayRotation = Quaternion.AngleAxis(fovHor/2, transform.up);

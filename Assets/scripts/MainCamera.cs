@@ -111,10 +111,11 @@ public class MainCamera : MonoBehaviour {
 									- (pLoc [i] - transform.position).magnitude * Mathf.Cos (Mathf.PI / 180 * Vector3.Angle ((pLoc [i] - transform.position), (middle - transform.position))));
 			}
 		}
-		//focus camera at mid point between players
+		// focus camera at mid point between players
 		transform.LookAt(middle);
 	}
 
+	// Angles relative in a plane
 	public float AngleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
 		Vector3 dir = to - from.position;
 		Vector3 p1 = Project(dir, planeNormal);
