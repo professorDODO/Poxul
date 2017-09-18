@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Sound : MonoBehaviour {
 
+	public int soundPow = 4;
 	private Rigidbody rb;
 	private AudioSource audio;
 
@@ -18,6 +19,6 @@ public class Sound : MonoBehaviour {
 		if (!audio.isPlaying) {
 				audio.Play ();
 		}
-		audio.volume = Mathf.Pow(rb.velocity.magnitude / GetComponent<Movement> ().maxSpeed, 4);
+		audio.volume = Mathf.Pow((rb.velocity.x + rb.velocity.z) / GetComponent<Movement>().maxSpeed, soundPow);
 	}
 }

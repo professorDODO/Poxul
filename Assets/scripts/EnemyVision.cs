@@ -7,6 +7,7 @@ public class EnemyVision : MonoBehaviour {
 	public float fovHor = 70;
 	public float fovVer	= 50;
 	public float viewRange = 10;
+	public float lookAroundSpeed = 10;
 
 	void Update () {
 		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
@@ -17,17 +18,13 @@ public class EnemyVision : MonoBehaviour {
 				RaycastHit hit;
 				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						//Debug.Log (string.Format ("Player{0} is seen", i + 1));
-					} else {
-						//Debug.Log (string.Format ("Player{0} is not seen", i + 1));
+						lookAt(pLoc[i], lookAroundSpeed);
 					}
 				}
-			} else {
-				//Debug.Log (string.Format("Player{0} is not seen", i + 1));
 			}
 		}
 	}
-		
+
 	public float AngleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
 		Vector3 dir = to - from.position;
 		Vector3 p1 = Project(dir, planeNormal);
@@ -37,6 +34,10 @@ public class EnemyVision : MonoBehaviour {
 
 	public Vector3 Project(Vector3 v, Vector3 onto) {
 		return v - (Vector3.Dot(v, onto) / Vector3.Dot(onto, onto)) * onto;
+	}
+
+	public void lookAt(Vector3 dir, float speed){
+		transform.parent.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir - transform.position), Time.deltaTime * speed);
 	}
 
 	void OnDrawGizmosSelected() {
