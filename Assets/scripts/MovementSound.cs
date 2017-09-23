@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sound : MonoBehaviour {
+public class MovementSound : MonoBehaviour {
 
 	public int soundPow = 4;
 	private Rigidbody rb;
@@ -19,6 +19,6 @@ public class Sound : MonoBehaviour {
 				audio.Play ();
 		}
 		// percentage of Speed influences the sound volume
-		audio.volume = Mathf.Pow((rb.velocity.x + rb.velocity.z) / GetComponent<Movement>().maxSpeed, soundPow);
+		audio.volume = Mathf.Pow(new Vector3(rb.velocity.x, 0, rb.velocity.z).magnitude / GetComponent<Movement>().maxSpeed, soundPow);
 	}
 }
