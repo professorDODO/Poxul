@@ -6,7 +6,7 @@ public class EnemyHearing : MonoBehaviour {
 	public Transform Player;
 	public float soundVolumeRecognition = 0.04f;
 	private AudioSource[] audioPlayer;
-	public float regard = 50f;
+	public float regard = 50f; //factor of alertness-increase when this sense is trigered
 	private bool[] noticedPlayer;
 	private Quaternion lookDir;
 
@@ -32,25 +32,7 @@ public class EnemyHearing : MonoBehaviour {
 				noticedPlayer [i] = true;
 			}
 		}
-		bool allFalse = true;
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			if (noticedPlayer [i]) {
-				allFalse = false;
-			}
-		}
-		if (GetComponent<EnemyVision> ().senseState != EnemyVision.SENSESTATE.SEEING) {
-			if (!allFalse) {
-				GetComponent<EnemyVision> ().senseState = EnemyVision.SENSESTATE.HEARING;
-				lookDir = GetComponent<EnemyVision> ().LastLocDir (pLoc, noticedPlayer);
-			}		
-			transform.parent.rotation = Quaternion.Slerp (transform.rotation, lookDir, Time.deltaTime * GetComponent<EnemyVision> ().lookAroundSpeed);
-		}
-		if (allFalse && Quaternion.Angle (lookDir, transform.rotation) < GetComponent<EnemyVision> ().lookDirAcc) {
-			GetComponent<EnemyVision> ().senseState = EnemyVision.SENSESTATE.NONE;
-		}
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			noticedPlayer [i] = false;
-		}
+		GetComponent<EnemyVision> ().handleLookAt (ref pLoc, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.HEARING);
 	}
 
 	void debugGUI(string element, float value){

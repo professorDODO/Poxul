@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyVision : MonoBehaviour {
-	public enum SENSESTATE {NONE, HEARING, SEEING};
-	public SENSESTATE senseState;
 	public Transform Player;
 	public float fovHor = 70;
 	public float fovVer	= 50;
 	public float viewRange = 10;
 	public float lookAroundSpeed = 10;
-	public float regard = 10f; //factor of alertness
-	public float lookDirAcc = 1f;
+	public float regard = 150f; //factor of alertness-increase when this sense is trigered
+	public float lookDirAcc = 1f; // comparison value in degree, when the enemy looks in the direction of last trigger
 	private bool[] noticedPlayer;
 	private Quaternion lookDir;
 
 	void Start(){
-		senseState = SENSESTATE.NONE;
 		lookDir = transform.rotation;
 	}
 
@@ -24,8 +21,8 @@ public class EnemyVision : MonoBehaviour {
 		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
 		noticedPlayer = new bool[pLoc.Length];
 		for (int i = 0; i < pLoc.Length; i++) {
-			float vertical = AngleInPlane(transform, pLoc[i], transform.right);
-			float horizontal = AngleInPlane(transform, pLoc[i], transform.up);
+			float vertical = angleInPlane(transform, pLoc[i], transform.right);
+			float horizontal = angleInPlane(transform, pLoc[i], transform.up);
 			if (vertical <= fovVer/2 && horizontal <= fovHor/2) {
 				RaycastHit hit;
 				// if there is any colider in the way to the player, the gameObject looks at the player
@@ -37,46 +34,35 @@ public class EnemyVision : MonoBehaviour {
 				}
 			}
 		}
+		handleLookAt (ref pLoc, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.SEEING);
+		debugGUI ("SESNSESTATE", (float)transform.parent.GetComponent<EnemyBrain>().senseState);
+	}
+
+	// look at the postion of the nearist trigger of the the sense with highest priority
+	public void handleLookAt(ref Vector3[] pLoc, ref bool[] noticedPlayer, ref Quaternion lookDir, ref EnemyBrain.SENSESTATE senseState, EnemyBrain.SENSESTATE thisSense){
 		bool allFalse = true;
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			if (noticedPlayer [i]) {
 				allFalse = false;
 			}
 		}
-		if (!allFalse) {
-			senseState = SENSESTATE.SEEING;
-			lookDir = LastLocDir (pLoc, noticedPlayer);
+		if (!allFalse && thisSense >= senseState) {
+			senseState = thisSense;
+			lookDir = lastLocDir (pLoc, noticedPlayer);
 		}
-		if (senseState == SENSESTATE.SEEING) {
+		if (senseState == thisSense) {
 			transform.parent.rotation = Quaternion.Slerp (transform.rotation, lookDir, Time.deltaTime * lookAroundSpeed);
 		}
 		if (allFalse && Quaternion.Angle (lookDir, transform.rotation) < lookDirAcc) {
-			senseState = SENSESTATE.NONE;
+			senseState = EnemyBrain.SENSESTATE.NONE;
 		}
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			noticedPlayer [i] = false;
-		}
-		debugGUI ("SESNSESTATE", (float)senseState);
-	}
-
-	public void LookAt(Vector3[] pLoc, bool[] noticedPlayer){
-		bool allFalse = true;
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			if (noticedPlayer [i]) {
-				allFalse = false;
-			}
-		}
-		if (!allFalse) {
-			lookDir = LastLocDir (pLoc, noticedPlayer);
-		}
-		transform.parent.rotation = Quaternion.Slerp(transform.rotation, lookDir, Time.deltaTime * lookAroundSpeed);
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			noticedPlayer [i] = false;
 		}
 	}
 
-	// rotates the gameObject towards
-	public Quaternion LastLocDir(Vector3[] pLoc, bool[] noticedPlayer){
+	// returns the rotation towards the next player who triggered a sense
+	public Quaternion lastLocDir(Vector3[] pLoc, bool[] noticedPlayer){
 		Vector3 minDistLoc = Vector3.zero;
 		float minDist = -1;
 		for (int i = 0; i < pLoc.Length; i++) {
@@ -92,13 +78,13 @@ public class EnemyVision : MonoBehaviour {
 	}
 		
 	// angles relative to a plane
-	public float AngleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
+	public float angleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
 		Vector3 dir = to - from.position;
-		Vector3 p1 = Project(dir, planeNormal);
-		Vector3 p2 = Project(from.forward, planeNormal);
+		Vector3 p1 = project(dir, planeNormal);
+		Vector3 p2 = project(from.forward, planeNormal);
 		return Vector3.Angle(p1, p2);
 	}
-	public Vector3 Project(Vector3 v, Vector3 onto) {
+	public Vector3 project(Vector3 v, Vector3 onto) {
 		return v - (Vector3.Dot(v, onto) / Vector3.Dot(onto, onto)) * onto;
 	}
 
