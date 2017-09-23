@@ -28,8 +28,10 @@ public class EnemyVision : MonoBehaviour {
 				// if there is any colider in the way to the player, the gameObject looks at the player
 				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						transform.parent.GetComponent<EnemyBrain>().senseTrigger(regard);
-						noticedPlayer [i] = true;
+						if (hit.transform.Find ("visiblePoints").GetComponent<Visibility> ().isVisible) {
+							transform.parent.GetComponent<EnemyBrain> ().senseTrigger (regard);
+							noticedPlayer [i] = true;
+						}
 					}
 				}
 			}
