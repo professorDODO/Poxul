@@ -6,6 +6,9 @@ public class EnemyHearing : MonoBehaviour {
 	public Transform Player;
 	public float soundVolumeRecognition = 0.04f;
 	private AudioSource[] audioPlayer;
+	public float regard = 50f; //factor of alertness-increase when this sense is trigered
+	private bool[] noticedPlayer;
+	private Quaternion lookDir;
 
 	void Awake() {
 		audioPlayer = new AudioSource[Player.GetComponent<PlayerLocation>().childCount(Player)];
@@ -16,12 +19,23 @@ public class EnemyHearing : MonoBehaviour {
 		}
 	}
 
+	void Start(){
+		lookDir = transform.rotation;
+	}
+
 	void Update () {
 		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
+		noticedPlayer = new bool[pLoc.Length];
 		for (int i = 0; i < pLoc.Length; i++) {
 			if(1/(pLoc[i] - transform.position).magnitude * audioPlayer[i].volume >= soundVolumeRecognition) {
-				GetComponent<EnemyVision>().lookAt(pLoc[i]);
+				transform.parent.GetComponent<EnemyBrain>().senseTrigger(regard);
+				noticedPlayer [i] = true;
 			}
 		}
+		GetComponent<EnemyVision> ().handleLookAt (ref pLoc, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.HEARING);
+	}
+
+	void debugGUI(string element, float value){
+		GameObject.Find ("GUI").GetComponent<debugGUI> ().debugElement (element, value);
 	}
 }
