@@ -1,0 +1,1 @@
+start "" "E:\Software\Git\bin\sh.exe" --login  -i -c "/e/SoftwareData/Unity/Poxul/git_scripts/changeDir_status_myzos.sh"
