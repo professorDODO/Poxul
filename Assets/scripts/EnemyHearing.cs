@@ -32,7 +32,7 @@ public class EnemyHearing : MonoBehaviour {
 				noticedPlayer [i] = true;
 			}
 		}
-		GetComponent<EnemyVision> ().handleLookAt (ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.HEARING);
+		GetComponent<EnemyVision> ().handleLookAt (ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain> ().senseState, EnemyBrain.SENSESTATE.HEARING);
 	}
 
 	void debugGUI(string element, float value){

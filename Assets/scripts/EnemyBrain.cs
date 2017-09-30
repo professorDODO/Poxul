@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyBrain : MonoBehaviour {
-	public enum SENSESTATE {NONE, HEARING, SEEING}; // sorted in proirity order
-	public SENSESTATE senseState;
+	[HideInInspector] public enum SENSESTATE {NONE, HEARING, SEEING}; // sorted in proirity order
+	[HideInInspector] public SENSESTATE senseState;
 	/*
 	 * NONE: the Enemy is not alerted
 	 * RUMORS: another Enemy reached ALERTNESS1 and transmitted the info

@@ -28,7 +28,7 @@ public class EnemyVision : MonoBehaviour {
 				transform.parent.GetComponent<EnemyBrain> ().senseTrigger (regard);
 			}
 		}
-		handleLookAt (ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.SEEING);
+		handleLookAt (ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain> ().senseState, EnemyBrain.SENSESTATE.SEEING);
 	}
 
 	public bool noticedPlayerCheck(Transform Player){
