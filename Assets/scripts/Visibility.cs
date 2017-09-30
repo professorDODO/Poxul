@@ -7,7 +7,8 @@ public class Visibility : MonoBehaviour {
 	private Transform[] LghtSrc;
 	private Transform[] VPnt;
 	private bool[] isSeenArr;
-	public bool isVisible;
+	public bool isVisible {get; private set;}
+	public float minIntensity = 15f;
 
 
 	void Start () {
@@ -29,23 +30,29 @@ public class Visibility : MonoBehaviour {
 	void Update () {
 		for (int i = 0; i < VPnt.Length; i++) {
 			for (int j = 0; j < LghtSrc.Length; j++) {
-				RaycastHit hit;
-				if (Physics.Raycast (VPnt [i].position, LghtSrc [j].position - VPnt [i].position, out hit, (LghtSrc [j].position - VPnt [i].position).magnitude + 1)) {
-					if (hit.transform.gameObject.layer == LayerMask.NameToLayer ("Enviroment")) {
-						isSeenArr[i] = false;
-					} else {
-						isSeenArr[i] = true;
-					}
-				} else {
-					isSeenArr[i] = true;
-				}
+				isSeenArr [i] = visibilityCheck (VPnt [i], LghtSrc [j], minIntensity);
 			}
 		}
 		isVisible = false;
 		for (int i = 0; i < isSeenArr.Length; i++) {
 			if (isSeenArr [i]) {isVisible = true;}
 		}
-		debugGUI ("isVisible", isVisible?1:0);
+		debugGUI ("isVisible P" + transform.parent.GetComponent<CharStats>().playerNumber.ToString(), isVisible?1:0);
+	}
+
+	//returns false, when the player is in a shadow or too far away from a light source (range and intensity multiplicator included)
+	private bool visibilityCheck(Transform VPnt, Transform LghtSrc, float minIntensity){
+		if (LghtSrc.GetComponent<Light> ().intensity * Mathf.Pow (LghtSrc.GetComponent<Light> ().range / (LghtSrc.position - VPnt.position).magnitude, 2) > minIntensity) {
+			RaycastHit hit;
+			if (Physics.Raycast (VPnt.position, LghtSrc.position - VPnt.position, out hit, (LghtSrc.position - VPnt.position).magnitude + 1)) {
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer ("Enviroment")) {
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+		return true;
 	}
 
 	private int childCount(Transform GO) {

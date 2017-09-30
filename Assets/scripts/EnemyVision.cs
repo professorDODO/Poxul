@@ -18,30 +18,42 @@ public class EnemyVision : MonoBehaviour {
 	}
 
 	void Update () {
-		Vector3[] pLoc = Player.GetComponent<PlayerLocation>().pLoc;
-		noticedPlayer = new bool[pLoc.Length];
-		for (int i = 0; i < pLoc.Length; i++) {
-			float vertical = angleInPlane(transform, pLoc[i], transform.right);
-			float horizontal = angleInPlane(transform, pLoc[i], transform.up);
-			if (vertical <= fovVer/2 && horizontal <= fovHor/2) {
+		Transform[] PlayerArr = Player.GetComponent<PlayerLocation>().PlayerArr;
+		noticedPlayer = new bool[PlayerArr.Length];
+		for (int i = 0; i < PlayerArr.Length; i++) {
+			noticedPlayer [i] = noticedPlayerCheck (PlayerArr[i]);
+		}
+		for (int i = 0; i < noticedPlayer.Length; i++) {
+			if (noticedPlayer [i]) {
+				transform.parent.GetComponent<EnemyBrain> ().senseTrigger (regard);
+			}
+		}
+		handleLookAt (ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.SEEING);
+	}
+
+	public bool noticedPlayerCheck(Transform Player){
+		Transform[] visiblePoints = new Transform[Player.Find ("visiblePoints").childCount];
+		for (int i = 0; i < visiblePoints.Length; i++) {
+			visiblePoints[i] = Player.Find ("visiblePoints").GetChild (i);
+			float vertical = angleInPlane (transform, visiblePoints[i].position, transform.right);
+			float horizontal = angleInPlane (transform, visiblePoints[i].position, transform.up);
+			if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
 				RaycastHit hit;
 				// if there is any colider in the way to the player, the gameObject looks at the player
-				if (Physics.Raycast (transform.position, pLoc [i] - transform.position, out hit, (pLoc [i] - transform.position).magnitude + 1)) {
-					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
+				if (Physics.Raycast (transform.position, visiblePoints[i].position - transform.position, out hit, (visiblePoints[i].position - transform.position).magnitude + 1)) {
+					if (hit.transform.gameObject.layer == LayerMask.NameToLayer ("Player")) {
 						if (hit.transform.Find ("visiblePoints").GetComponent<Visibility> ().isVisible) {
-							transform.parent.GetComponent<EnemyBrain> ().senseTrigger (regard);
-							noticedPlayer [i] = true;
+							return true;
 						}
 					}
 				}
 			}
 		}
-		handleLookAt (ref pLoc, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.SEEING);
-		debugGUI ("SESNSESTATE", (float)transform.parent.GetComponent<EnemyBrain>().senseState);
+		return false;
 	}
 
 	// look at the postion of the nearist trigger of the the sense with highest priority
-	public void handleLookAt(ref Vector3[] pLoc, ref bool[] noticedPlayer, ref Quaternion lookDir, ref EnemyBrain.SENSESTATE senseState, EnemyBrain.SENSESTATE thisSense){
+	public void handleLookAt(ref Transform[] PlayerArr, ref bool[] noticedPlayer, ref Quaternion lookDir, ref EnemyBrain.SENSESTATE senseState, EnemyBrain.SENSESTATE thisSense){
 		bool allFalse = true;
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			if (noticedPlayer [i]) {
@@ -50,7 +62,7 @@ public class EnemyVision : MonoBehaviour {
 		}
 		if (!allFalse && thisSense >= senseState) {
 			senseState = thisSense;
-			lookDir = lastLocDir (pLoc, noticedPlayer);
+			lookDir = lastLocDir (PlayerArr, noticedPlayer);
 		}
 		if (senseState == thisSense) {
 			transform.parent.rotation = Quaternion.Slerp (transform.rotation, lookDir, Time.deltaTime * lookAroundSpeed);
@@ -64,15 +76,15 @@ public class EnemyVision : MonoBehaviour {
 	}
 
 	// returns the rotation towards the next player who triggered a sense
-	public Quaternion lastLocDir(Vector3[] pLoc, bool[] noticedPlayer){
+	public Quaternion lastLocDir(Transform[] PlayerArr, bool[] noticedPlayer){
 		Vector3 minDistLoc = Vector3.zero;
 		float minDist = -1;
-		for (int i = 0; i < pLoc.Length; i++) {
+		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (noticedPlayer[i] && minDist == -1) {
-				minDistLoc = pLoc [i];
+				minDistLoc = PlayerArr [i].position;
 			}
-			if (noticedPlayer[i] && (pLoc[i] - transform.position).magnitude < minDist) {
-				minDistLoc = pLoc [i];
+			if (noticedPlayer[i] && (PlayerArr[i].position - transform.position).magnitude < minDist) {
+				minDistLoc = PlayerArr [i].position;
 				minDist = (minDistLoc - transform.position).magnitude;
 			}
 		}

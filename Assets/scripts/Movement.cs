@@ -6,16 +6,17 @@ using XboxCtrlrInput;
 public class Movement : MonoBehaviour {
 
 	private Rigidbody rb;
-	public float playerIndex = 1;
 	public float groundDrag = 0.5f;
 	public float moveForce = 50;
 	public float maxSpeed = 10;
 	public float sneakSpeedFac = 0.5f;
+	private int playerIndex = 1;
 	private bool sneak;
 	private float ssFac;
 
 	void Awake() {
 		rb = GetComponent<Rigidbody>();
+		playerIndex = transform.GetComponent<CharStats> ().playerNumber;
 		sneak = false;
 		ssFac = 1;
 	}
@@ -34,7 +35,7 @@ public class Movement : MonoBehaviour {
 			} else {
 				ssFac = 1;
 			}
-			Debug.Log ("Sneak: " + sneak);
+			debugGUI ("sneak P" + playerIndex.ToString(), sneak?1:0);
 		}
 		// if there is no input, the player "slides" till it stops
 		if (XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex) == 0 && XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex) == 0) {
@@ -56,6 +57,11 @@ public class Movement : MonoBehaviour {
 			transform.rotation = Quaternion.LookRotation (rightDir * lsX + forwardDir * lsY);
 		}
 	}
+
+	void debugGUI(string element, float value){
+		GameObject.Find ("GUI").GetComponent<debugGUI> ().debugElement (element, value);
+	}
 }
+
 
 //!! stickMagnitude should generate a constant velocity

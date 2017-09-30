@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerLocation : MonoBehaviour {
-	[HideInInspector] public Vector3[] pLoc;
+	public Transform[] PlayerArr {get; private set;}
 
 	void Awake(){
-		pLoc = new Vector3[childCount(transform)];
+		PlayerArr = new Transform[childCount(transform)];
 	}
 
 	void Update () {
 		// storing the player locations
 		for (int i = 0; i < transform.childCount; i++) {
 			if(transform.GetChild(i).gameObject.activeSelf) {
-				pLoc[i] = transform.GetChild(i).position;
+				PlayerArr[i] = transform.GetChild(i);
 			}
 		}
 	}

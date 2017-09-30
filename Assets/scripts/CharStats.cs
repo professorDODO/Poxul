@@ -45,6 +45,6 @@ public class CharStats : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		//StatChange (STATS.HEALTH, 2);
-		Debug.Log (dynStats [(int)STATS.PAIN]);
+		//Debug.Log (dynStats [(int)STATS.PAIN]);
 	}
 }
