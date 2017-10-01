@@ -21,8 +21,8 @@ public class MainCamera : MonoBehaviour {
 	void Awake() {
 		fovHorZoomIn = Camera.main.fieldOfView * (1 - zoomInOffset);
 		fovHorZoomOut = Camera.main.fieldOfView * (1 - zoomOutOffset);
-		fovVerZoomIn = Camera.main.fieldOfView/Camera.main.aspect * (1 - zoomInOffset);
-		fovVerZoomOut = Camera.main.fieldOfView/Camera.main.aspect * (1 - zoomOutOffset);
+		fovVerZoomIn = Camera.main.fieldOfView / Camera.main.aspect * (1 - zoomInOffset);
+		fovVerZoomOut = Camera.main.fieldOfView / Camera.main.aspect * (1 - zoomOutOffset);
 	}
 
 	void LateUpdate() {
@@ -33,18 +33,18 @@ public class MainCamera : MonoBehaviour {
 		//turning camera
 		float rsXInput = 0;
 		float rsYInput = 0;
-		for(int i = 1; i <= PlayerArr.Length; i++) {
-			rsXInput += (invertX ? -1 : 1) * XCI.GetAxis (XboxAxis.RightStickX, (XboxController)i);
-			rsYInput += (invertY ? 1 : -1) * XCI.GetAxis (XboxAxis.RightStickY, (XboxController)i);
+		for (int i = 1; i <= PlayerArr.Length; i++) {
+			rsXInput += (invertX ? -1 : 1) * XCI.GetAxis(XboxAxis.RightStickX, (XboxController)i);
+			rsYInput += (invertY ? 1 : -1) * XCI.GetAxis(XboxAxis.RightStickY, (XboxController)i);
 		}
 		transform.LookAt(middle);
-		transform.RotateAround (middle, rsXInput * Vector3.up, Time.deltaTime * camSpeed * Mathf.Abs(rsXInput));
+		transform.RotateAround(middle, rsXInput * Vector3.up, Time.deltaTime * camSpeed * Mathf.Abs(rsXInput));
 		if (transform.rotation.eulerAngles.x < 88) {
-			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
+			transform.RotateAround(middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		} else if (transform.rotation.eulerAngles.x > 88 && transform.rotation.eulerAngles.x < 270 && rsYInput <= 0) {
-			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
+			transform.RotateAround(middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		} else if (transform.rotation.eulerAngles.x > 270 && rsYInput >= 0) {
-			transform.RotateAround (middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
+			transform.RotateAround(middle, rsYInput * transform.right, Time.deltaTime * camSpeed * Mathf.Abs(rsYInput));
 		}
 		//zoom out
 		for (int i = 0; i < PlayerArr.Length; i++) {
@@ -52,16 +52,16 @@ public class MainCamera : MonoBehaviour {
 			float vertical = AngleInPlane(transform, PlayerArr[i].position, transform.right);
 			float horizontal = AngleInPlane(transform, PlayerArr[i].position, transform.up);
 			if (horizontal > fovHorZoomOut) {
-				transform.LookAt (middle);
-				transform.position -= transform.forward.normalized * (PlayerArr [i].position - transform.position).magnitude
-					* Mathf.Sin (Mathf.PI/180*(horizontal - fovHorZoomOut))
-					/ Mathf.Sin (Mathf.PI/180*fovHorZoomOut);
+				transform.LookAt(middle);
+				transform.position -= transform.forward.normalized * (PlayerArr[i].position - transform.position).magnitude
+				* Mathf.Sin(Mathf.PI / 180 * (horizontal - fovHorZoomOut))
+				/ Mathf.Sin(Mathf.PI / 180 * fovHorZoomOut);
 			}
 			if (vertical > fovVerZoomOut) {
-				transform.LookAt (middle);
-				transform.position -= transform.forward.normalized * (PlayerArr [i].position - transform.position).magnitude
-					* Mathf.Sin (Mathf.PI/180*(vertical - fovVerZoomOut))
-					/ Mathf.Sin (Mathf.PI/180*fovVerZoomOut);
+				transform.LookAt(middle);
+				transform.position -= transform.forward.normalized * (PlayerArr[i].position - transform.position).magnitude
+				* Mathf.Sin(Mathf.PI / 180 * (vertical - fovVerZoomOut))
+				/ Mathf.Sin(Mathf.PI / 180 * fovVerZoomOut);
 			}
 		}
 		//zoom in
@@ -76,8 +76,8 @@ public class MainCamera : MonoBehaviour {
 			playerMaxAngleVerIndex = 0;
 		} else {
 			for (int i = 0; i < PlayerArr.Length; ++i) {
-				float vertical = AngleInPlane (transform, PlayerArr [i].position, transform.right);
-				float horizontal = AngleInPlane (transform, PlayerArr [i].position, transform.up);
+				float vertical = AngleInPlane(transform, PlayerArr[i].position, transform.right);
+				float horizontal = AngleInPlane(transform, PlayerArr[i].position, transform.up);
 				if (vertical > maxAngleVer) {
 					maxAngleVer = vertical;
 					playerMaxAngleVerIndex = i;
@@ -89,26 +89,26 @@ public class MainCamera : MonoBehaviour {
 			}
 		}
 		if (maxAngleVer < fovVerZoomIn && maxAngleHor < fovHorZoomIn) {
-			transform.LookAt (middle);
+			transform.LookAt(middle);
 			//check if a Player is nearer to the top or the sides, to determine which Angle should be respected when zooming
 			if (maxAngleVer / fovVerZoomIn >= maxAngleHor / fovHorZoomIn) {
-				transform.position -= transform.forward.normalized * (PlayerArr [playerMaxAngleVerIndex].position - transform.position).magnitude
-					* Mathf.Sin (Mathf.PI / 180 * (AngleInPlane (transform, PlayerArr [playerMaxAngleVerIndex].position, transform.right) - fovVerZoomIn))
-				/ Mathf.Sin (Mathf.PI / 180 * fovVerZoomIn);
+				transform.position -= transform.forward.normalized * (PlayerArr[playerMaxAngleVerIndex].position - transform.position).magnitude
+				* Mathf.Sin(Mathf.PI / 180 * (AngleInPlane(transform, PlayerArr[playerMaxAngleVerIndex].position, transform.right) - fovVerZoomIn))
+				/ Mathf.Sin(Mathf.PI / 180 * fovVerZoomIn);
 			} else {
-				transform.position -= transform.forward.normalized * (PlayerArr [playerMaxAngleHorIndex].position - transform.position).magnitude
-					* Mathf.Sin (Mathf.PI / 180 * (AngleInPlane (transform, PlayerArr [playerMaxAngleHorIndex].position, transform.up) - fovHorZoomIn))
-				/ Mathf.Sin (Mathf.PI / 180 * fovHorZoomIn);
+				transform.position -= transform.forward.normalized * (PlayerArr[playerMaxAngleHorIndex].position - transform.position).magnitude
+				* Mathf.Sin(Mathf.PI / 180 * (AngleInPlane(transform, PlayerArr[playerMaxAngleHorIndex].position, transform.up) - fovHorZoomIn))
+				/ Mathf.Sin(Mathf.PI / 180 * fovHorZoomIn);
 			}
 		}
 		// set min distance to nearest Player
 		for (int i = 0; i < PlayerArr.Length; i++) {
-			if ((PlayerArr [i].position - transform.position).magnitude < minDistance) {
+			if ((PlayerArr[i].position - transform.position).magnitude < minDistance) {
 				transform.LookAt(middle);
-				transform.position -= transform.forward.normalized * (minDistance * Mathf.Sqrt (1 -
-									Mathf.Pow ((PlayerArr [i].position - transform.position).magnitude / minDistance
-									* Mathf.Sin (Mathf.PI / 180 * Vector3.Angle ((PlayerArr [i].position - transform.position), (middle - transform.position))), 2))
-									- (PlayerArr [i].position - transform.position).magnitude * Mathf.Cos (Mathf.PI / 180 * Vector3.Angle ((PlayerArr [i].position - transform.position), (middle - transform.position))));
+				transform.position -= transform.forward.normalized * (minDistance * Mathf.Sqrt(1 -
+				Mathf.Pow((PlayerArr[i].position - transform.position).magnitude / minDistance
+				* Mathf.Sin(Mathf.PI / 180 * Vector3.Angle((PlayerArr[i].position - transform.position), (middle - transform.position))), 2))
+				- (PlayerArr[i].position - transform.position).magnitude * Mathf.Cos(Mathf.PI / 180 * Vector3.Angle((PlayerArr[i].position - transform.position), (middle - transform.position))));
 			}
 		}
 		// focus camera at mid point between players

@@ -16,50 +16,50 @@ public class Movement : MonoBehaviour {
 
 	void Awake() {
 		rb = GetComponent<Rigidbody>();
-		playerIndex = transform.GetComponent<CharStats> ().playerNumber;
+		playerIndex = transform.GetComponent<CharStats>().playerNumber;
 		sneak = false;
 		ssFac = 1;
 	}
-		
+
 	void Update() {
 		// enables movement relative to the camera angle
-		Vector3 forwardDir = new Vector3 (Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
-		Vector3 rightDir = new Vector3 (Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
-		float lsX = XCI.GetAxis (XboxAxis.LeftStickX, (XboxController)playerIndex);
-		float lsY = XCI.GetAxis (XboxAxis.LeftStickY, (XboxController)playerIndex);
+		Vector3 forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
+		Vector3 rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
+		float lsX = XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex);
+		float lsY = XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex);
 		// reduces the maxspeed to sneakspeed
-		if (XCI.GetButtonUp (XboxButton.LeftStick, (XboxController)playerIndex)) {
+		if (XCI.GetButtonUp(XboxButton.LeftStick, (XboxController)playerIndex)) {
 			sneak = !sneak;
 			if (sneak) {
 				ssFac = sneakSpeedFac;
 			} else {
 				ssFac = 1;
 			}
-			debugGUI ("sneak P" + playerIndex.ToString(), sneak?1:0);
+			debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
 		}
 		// if there is no input, the player "slides" till it stops
 		if (XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex) == 0 && XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex) == 0) {
-			rb.velocity = new Vector3 (rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
+			rb.velocity = new Vector3(rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
 		} else {
 			// ḿoving in given direction
-			rb.AddForce (rightDir * lsX * moveForce / groundDrag);
-			rb.AddForce (forwardDir * lsY * moveForce / groundDrag);
+			rb.AddForce(rightDir * lsX * moveForce / groundDrag);
+			rb.AddForce(forwardDir * lsY * moveForce / groundDrag);
 		}
 		// reduces the speed to maxSpeed if it goes above
 		if (rb.velocity.magnitude > maxSpeed * ssFac) {
 			//future: addForce
 			float yVel = rb.velocity.y;
 			rb.velocity = rb.velocity.normalized * maxSpeed * ssFac;
-			rb.velocity = new Vector3 (rb.velocity.x, yVel,rb.velocity.z);
+			rb.velocity = new Vector3(rb.velocity.x, yVel, rb.velocity.z);
 		}
 		// player looks in movement direction
 		if (lsX != 0 && lsY != 0) {
-			transform.rotation = Quaternion.LookRotation (rightDir * lsX + forwardDir * lsY);
+			transform.rotation = Quaternion.LookRotation(rightDir * lsX + forwardDir * lsY);
 		}
 	}
 
-	void debugGUI(string element, float value){
-		GameObject.Find ("GUI").GetComponent<debugGUI> ().debugElement (element, value);
+	void debugGUI(string element, float value) {
+		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }
 

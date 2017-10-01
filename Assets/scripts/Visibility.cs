@@ -7,49 +7,50 @@ public class Visibility : MonoBehaviour {
 	private Transform[] LghtSrc;
 	private Transform[] VPnt;
 	private bool[,] isSeenArr;
-	public bool isVisible {get; private set;}
+
+	public bool isVisible { get; private set; }
+
 	public float minIntensity = 15f;
 
 
-	void Start () {
+	void Start() {
 		VPnt = new Transform[childCount(transform)];
 		for (int i = 0; i < transform.childCount; i++) {
-			if(transform.GetChild(i).gameObject.activeSelf) {
-				VPnt [i] = transform.GetChild (i);
+			if (transform.GetChild(i).gameObject.activeSelf) {
+				VPnt[i] = transform.GetChild(i);
 			}
 		}
 		LghtSrc = new Transform[childCount(LightSource)];
 		for (int i = 0; i < LightSource.childCount; i++) {
-			if(LightSource.GetChild(i).gameObject.activeSelf) {
-				LghtSrc [i] = LightSource.GetChild (i);
+			if (LightSource.GetChild(i).gameObject.activeSelf) {
+				LghtSrc[i] = LightSource.GetChild(i);
 			}
 		}
 		isSeenArr = new bool[VPnt.Length, LghtSrc.Length];
 	}
 
-	void Update () {
+	void Update() {
 		for (int i = 0; i < VPnt.Length; i++) {
 			for (int j = 0; j < LghtSrc.Length; j++) {
-				isSeenArr [i, j] = visibilityCheck (VPnt [i], LghtSrc [j], minIntensity);
+				isSeenArr[i, j] = visibilityCheck(VPnt[i], LghtSrc[j], minIntensity);
 			}
 		}
 		isVisible = false;
 		for (int i = 0; i < isSeenArr.GetLength(0); i++) {
 			for (int j = 0; j < isSeenArr.GetLength(1); j++) {
-				if (isSeenArr [i, j]) {
+				if (isSeenArr[i, j]) {
 					isVisible = true;
 				}
 			}
 		}
-		debugGUI ("isVisible P" + transform.parent.GetComponent<CharStats>().playerNumber.ToString(), isVisible?1:0);
 	}
 
 	//returns false, when the player is in a shadow or too far away from a light source (range and intensity multiplicator included)
-	private bool visibilityCheck(Transform VPnt, Transform LghtSrc, float minIntensity){
-		if (LghtSrc.GetComponent<Light> ().intensity * Mathf.Pow (LghtSrc.GetComponent<Light> ().range / (LghtSrc.position - VPnt.position).magnitude, 2) > minIntensity) {
+	bool visibilityCheck(Transform VPnt, Transform LghtSrc, float minIntensity) {
+		if (LghtSrc.GetComponent<Light>().intensity * Mathf.Pow(LghtSrc.GetComponent<Light>().range / (LghtSrc.position - VPnt.position).magnitude, 2) > minIntensity) {
 			RaycastHit hit;
-			if (Physics.Raycast (VPnt.position, LghtSrc.position - VPnt.position, out hit, (LghtSrc.position - VPnt.position).magnitude + 1)) {
-				if (hit.transform.gameObject.layer == LayerMask.NameToLayer ("Enviroment")) {
+			if (Physics.Raycast(VPnt.position, LghtSrc.position - VPnt.position, out hit, (LghtSrc.position - VPnt.position).magnitude + 1)) {
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Enviroment")) {
 					return false;
 				}
 			}
@@ -59,17 +60,17 @@ public class Visibility : MonoBehaviour {
 		return true;
 	}
 
-	private int childCount(Transform GO) {
+	int childCount(Transform GO) {
 		int childCount = 0;
 		for (int i = 0; i < GO.childCount; i++) {
-			if (GO.GetChild (i).gameObject.activeSelf) {
+			if (GO.GetChild(i).gameObject.activeSelf) {
 				childCount++;
 			}
 		}
 		return childCount;
 	}
 
-	void debugGUI(string element, float value){
-		GameObject.Find ("GUI").GetComponent<debugGUI> ().debugElement (element, value);
+	void debugGUI(string element, float value) {
+		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }

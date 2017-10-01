@@ -16,17 +16,17 @@ public class EnemyLooking : MonoBehaviour {
 		lr = true;
 	}
 
-	void Update () {
-		if (GetComponent<EnemyBrain> ().senseState == EnemyBrain.SENSESTATE.NONE) {
-			if (Quaternion.Angle (aimedRotation, transform.rotation) < lookDirAcc) {
+	void Update() {
+		if (GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
+			if (Quaternion.Angle(aimedRotation, transform.rotation) < lookDirAcc) {
 				if (lr) {
-					aimedRotation = defaultRotation * Quaternion.Inverse(Quaternion.Euler (0,lookAngle, 0));
+					aimedRotation = defaultRotation * Quaternion.Inverse(Quaternion.Euler(0, lookAngle, 0));
 				} else {
 					aimedRotation = defaultRotation * Quaternion.Euler(0, lookAngle, 0);
 				}
 				lr = !lr;
 			} else {
-				transform.rotation = Quaternion.Slerp (transform.rotation, aimedRotation, lookSpeed*Time.deltaTime);
+				transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation, lookSpeed * Time.deltaTime);
 			}
 		}
 	}

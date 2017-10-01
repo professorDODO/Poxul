@@ -3,7 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyBrain : MonoBehaviour {
-	[HideInInspector] public enum SENSESTATE {NONE, HEARING, SEEING}; // sorted in proirity order
+	[HideInInspector] public enum SENSESTATE {
+		NONE,
+		HEARING,
+		SEEING}
+
+	;
+	// sorted in proirity order
 	[HideInInspector] public SENSESTATE senseState;
 	/*
 	 * NONE: the Enemy is not alerted
@@ -12,9 +18,20 @@ public class EnemyBrain : MonoBehaviour {
 	 * ALERTNESS2: another Enemy reached ALERTNESS3
 	 * ALERTNESS3: the Enemy heart or saw the Player 
 	 */
-	[HideInInspector] public enum ALERTSTATE {NONE, RUMORS, ALERTNESS1, ALERTNESS2, ALERTNESS3};  // sorted in proirity order
+	[HideInInspector] public enum ALERTSTATE {
+		NONE,
+		RUMORS,
+		ALERTNESS1,
+		ALERTNESS2,
+		ALERTNESS3}
+
+	;
+	// sorted in proirity order
 	[HideInInspector] public ALERTSTATE alertState;
-	public float nextAlertState = 100f; // the value alertness needs reach to reach the next alertState
+	public Transform Player;
+	public int enemyIndex;
+	public float nextAlertState = 100f;
+	// the value alertness needs reach to reach the next alertState
 	public float alertnessDecay = 5;
 	private float alertness = 0f;
 
@@ -25,13 +42,13 @@ public class EnemyBrain : MonoBehaviour {
 
 	void Update() {
 		decayAlert();
-		debugGUI ("alertness", alertness);
-		debugGUI ("ALERTSTATE", (float)alertState);
+		debugGUI("alertness E" + enemyIndex.ToString(), alertness);
+		debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
 	}
 
 	// is called from a Sense script
 	public void senseTrigger(float fac) {
-		senseDelay (fac);
+		senseDelay(fac);
 		//stuff to do when triggered
 	}
 
@@ -39,7 +56,7 @@ public class EnemyBrain : MonoBehaviour {
 	void decayAlert() {
 		if (alertness >= 0f && alertState >= ALERTSTATE.NONE) {
 			alertness -= alertnessDecay * Time.deltaTime;
-		} else if(alertness < 0f && alertState > ALERTSTATE.NONE){
+		} else if (alertness < 0f && alertState > ALERTSTATE.NONE) {
 			alertness = 100;
 			alertState--;
 		}
@@ -64,7 +81,7 @@ public class EnemyBrain : MonoBehaviour {
 		}
 	}
 
-	void debugGUI(string element, float value){
-	GameObject.Find ("GUI").GetComponent<debugGUI> ().debugElement (element, value);
+	void debugGUI(string element, float value) {
+		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }
