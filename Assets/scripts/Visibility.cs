@@ -6,7 +6,7 @@ public class Visibility : MonoBehaviour {
 	public Transform LightSource;
 	private Transform[] LghtSrc;
 	private Transform[] VPnt;
-	private bool[] isSeenArr;
+	private bool[,] isSeenArr;
 	public bool isVisible {get; private set;}
 	public float minIntensity = 15f;
 
@@ -24,18 +24,22 @@ public class Visibility : MonoBehaviour {
 				LghtSrc [i] = LightSource.GetChild (i);
 			}
 		}
-		isSeenArr = new bool[VPnt.Length];
+		isSeenArr = new bool[VPnt.Length, LghtSrc.Length];
 	}
 
 	void Update () {
 		for (int i = 0; i < VPnt.Length; i++) {
 			for (int j = 0; j < LghtSrc.Length; j++) {
-				isSeenArr [i] = visibilityCheck (VPnt [i], LghtSrc [j], minIntensity);
+				isSeenArr [i, j] = visibilityCheck (VPnt [i], LghtSrc [j], minIntensity);
 			}
 		}
 		isVisible = false;
-		for (int i = 0; i < isSeenArr.Length; i++) {
-			if (isSeenArr [i]) {isVisible = true;}
+		for (int i = 0; i < isSeenArr.GetLength(0); i++) {
+			for (int j = 0; j < isSeenArr.GetLength(1); j++) {
+				if (isSeenArr [i, j]) {
+					isVisible = true;
+				}
+			}
 		}
 		debugGUI ("isVisible P" + transform.parent.GetComponent<CharStats>().playerNumber.ToString(), isVisible?1:0);
 	}

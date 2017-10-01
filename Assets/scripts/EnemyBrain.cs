@@ -12,8 +12,8 @@ public class EnemyBrain : MonoBehaviour {
 	 * ALERTNESS2: another Enemy reached ALERTNESS3
 	 * ALERTNESS3: the Enemy heart or saw the Player 
 	 */
-	public enum ALERTSTATE {NONE, RUMORS, ALERTNESS1, ALERTNESS2, ALERTNESS3};  // sorted in proirity order
-	public ALERTSTATE alertState;
+	[HideInInspector] public enum ALERTSTATE {NONE, RUMORS, ALERTNESS1, ALERTNESS2, ALERTNESS3};  // sorted in proirity order
+	[HideInInspector] public ALERTSTATE alertState;
 	public float nextAlertState = 100f; // the value alertness needs reach to reach the next alertState
 	public float alertnessDecay = 5;
 	private float alertness = 0f;
