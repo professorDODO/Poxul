@@ -23,8 +23,6 @@ public class Freeze : MonoBehaviour {
 		if(!lastFreeze && freeze){
 			lastVelo = rb.velocity;
 			lastAngVelo = rb.angularVelocity;
-			rb.velocity = Vector3.zero;
-			rb.angularVelocity = Vector3.zero;
 			rb.isKinematic = true;
 		}else if(lastFreeze && !freeze){
 			rb.isKinematic = false;
