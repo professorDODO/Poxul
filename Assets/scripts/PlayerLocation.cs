@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerLocation : MonoBehaviour {
-	[HideInInspector] public Vector3[] pLoc;
+	public Transform[] PlayerArr { get; private set; }
 
-	void Awake(){
-		pLoc = new Vector3[childCount(transform)];
-	}
-
-	void Update () {
-		// storing the player locations
+	void Awake() {
+		PlayerArr = new Transform[childCount(transform)];
 		for (int i = 0; i < transform.childCount; i++) {
-			if(transform.GetChild(i).gameObject.activeSelf) {
-				pLoc[i] = transform.GetChild(i).position;
+			if (transform.GetChild(i).gameObject.activeSelf) {
+				PlayerArr[i] = transform.GetChild(i);
 			}
 		}
 	}
@@ -22,7 +18,7 @@ public class PlayerLocation : MonoBehaviour {
 	public int childCount(Transform Player) {
 		int childCount = 0;
 		for (int i = 0; i < Player.childCount; i++) {
-			if(Player.GetChild(i).gameObject.activeSelf) {
+			if (Player.GetChild(i).gameObject.activeSelf) {
 				childCount++;
 			}
 		}
