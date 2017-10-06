@@ -22,62 +22,64 @@ public class EnemyBrain : MonoBehaviour {
 		NONE,
 		RUMORS,
 		ALERTNESS1,
-		ALERTNESS2,
-		ALERTNESS3}
+		ALERTNESS2}
 
 	;
 	// sorted in proirity order
 	[HideInInspector] public ALERTSTATE alertState;
 	public Transform Player;
 	public int enemyIndex;
-	public float nextAlertState = 100f;
-	// the value alertness needs reach to reach the next alertState
-	public float alertnessDecay = 5;
+	public float alertnessStep = 100f;
+	private float alertnessMin = 0f;
+	private float alertnessMax;
+	public float baseAlertnessDecay = 0.1f; // in % of alertnessStep per deltaTime
 	private float alertness = 0f;
 
-	void start() {
+	void Start() {
+		alertnessMax = alertnessStep * (int)ALERTSTATE.ALERTNESS2;
 		senseState = SENSESTATE.NONE;
 		alertState = ALERTSTATE.NONE;
 	}
 
 	void Update() {
-		decayAlert();
+		alertnessDecay();
+		if (alertState >= ALERTSTATE.ALERTNESS1) {
+			handleHighAlertReaction();
+		}
 		debugGUI("alertness E" + enemyIndex.ToString(), alertness);
 		debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
+		debugGUI("SENSESTATE E" + enemyIndex.ToString(), (float)senseState);
 	}
 
 	// is called from a Sense script
 	public void senseTrigger(float fac) {
-		senseDelay(fac);
-		//stuff to do when triggered
+		alertness += fac * Time.deltaTime;
+		if (alertness >= alertnessStep * (int)ALERTSTATE.ALERTNESS1 && alertState != ALERTSTATE.ALERTNESS2) {
+			alertnessMin = alertnessStep * (int)ALERTSTATE.ALERTNESS1;
+			alertState = ALERTSTATE.ALERTNESS1;
+		}
+		if (alertness > alertnessMax) {
+			alertState = ALERTSTATE.ALERTNESS2;
+			alertness = alertnessMax;
+		}
 	}
 
 	// decay of the alertness value over time
-	void decayAlert() {
-		if (alertness >= 0f && alertState >= ALERTSTATE.NONE) {
-			alertness -= alertnessDecay * Time.deltaTime;
-		} else if (alertness < 0f && alertState > ALERTSTATE.NONE) {
-			alertness = 100;
-			alertState--;
+	void alertnessDecay() {
+		if (alertState != ALERTSTATE.ALERTNESS2) {
+			alertness -= baseAlertnessDecay * alertnessStep
+						 * ((int)ALERTSTATE.ALERTNESS2 / ((int)ALERTSTATE.ALERTNESS2 - (int)alertState)) * Time.deltaTime;
 		}
-		if (alertness < 0f && alertState == ALERTSTATE.NONE) {
-			alertness = 0f;
+		if (alertness < alertnessMin) {
+			alertness = alertnessMin;
 		}
 	}
 
-	// handling a delay for enemies to notice what they see or hear
-	void senseDelay(float fac) {
-		if (alertness < nextAlertState && alertState <= ALERTSTATE.ALERTNESS3) {
-			alertness += fac * Time.deltaTime;	
-		} else if (alertness >= nextAlertState && alertState < ALERTSTATE.ALERTNESS1) {
-			alertness = 0f;
-			alertState = ALERTSTATE.ALERTNESS1;
-		} else if (alertness >= nextAlertState && alertState >= ALERTSTATE.ALERTNESS1 && alertState < ALERTSTATE.ALERTNESS3) {
-			alertness = 0f;
-			alertState = ALERTSTATE.ALERTNESS3;
-		}
-		if (alertness > nextAlertState && alertState == ALERTSTATE.ALERTNESS3) {
-			alertness = 100f;
+	void handleHighAlertReaction() {
+		if (alertState == ALERTSTATE.ALERTNESS1) {
+			
+		} else if (alertState == ALERTSTATE.ALERTNESS2) {
+			
 		}
 	}
 

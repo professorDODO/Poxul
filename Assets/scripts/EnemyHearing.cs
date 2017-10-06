@@ -25,15 +25,17 @@ public class EnemyHearing : MonoBehaviour {
 	}
 
 	void Update() {
-		
 		noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i], audioPlayer[i]) >= soundVolumeRecognition) {
-				transform.parent.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i], audioPlayer[i]) / soundVolumeRecognition * regard);
+				transform.parent.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i], audioPlayer[i])
+				                                                         / soundVolumeRecognition * regard);
 				noticedPlayer[i] = true;
 			}
 		}
-		GetComponent<EnemyVision>().handleLookAt(ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.HEARING);
+		transform.parent.GetComponent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
+		                                         						 ref transform.parent.GetComponent<EnemyBrain>().senseState,
+		                                         						 EnemyBrain.SENSESTATE.HEARING);
 	}
 
 	float listeningVolume(Transform Player, AudioSource audioPlayer) {
