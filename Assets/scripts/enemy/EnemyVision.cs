@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyVision : MonoBehaviour {
 	public float fovHor = 70;
 	public float fovVer	= 50;
-	public float viewRange = 10;
+	public float intensityThreshhold = 15f;
 	public float regard = 150f; //factor of alertness-increase when this sense is trigered
 	private Transform[] PlayerArr;
 	private bool[] noticedPlayer;
@@ -19,7 +19,13 @@ public class EnemyVision : MonoBehaviour {
 	void Update() {
 		noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
-			noticedPlayer[i] = noticedPlayerCheck(PlayerArr[i]);
+			float sensedIntensity = noticedIntesity(PlayerArr[i]);
+			if(sensedIntensity >= intensityThreshhold) {
+				noticedPlayer[i] = true;
+			}
+			debugGUI("sensedIntensity E" + transform.parent.GetComponent<EnemyBrain>().enemyIndex.ToString()
+			         + " P" + i.ToString(),
+			         sensedIntensity);
 		}
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			if (noticedPlayer[i]) {
@@ -31,26 +37,27 @@ public class EnemyVision : MonoBehaviour {
 		                                                                 EnemyBrain.SENSESTATE.SEEING);
 	}
 
-	bool noticedPlayerCheck(Transform Player) {
-		Transform[] visiblePoints = new Transform[Player.Find("visiblePoints").childCount];
+	float noticedIntesity(Transform Player) {
+		float sensedIntensity = 0f;
+		Transform[] visiblePoints = new Transform[childCount(Player.Find("visiblePoints"))];
 		for (int i = 0; i < visiblePoints.Length; i++) {
-			visiblePoints[i] = Player.Find("visiblePoints").GetChild(i);
+			if (Player.Find("visiblePoints").GetChild(i).gameObject.activeSelf) {
+				visiblePoints[i] = Player.Find("visiblePoints").GetChild(i);
+			}
 			float vertical = angleInPlane(transform, visiblePoints[i].position, transform.right);
 			float horizontal = angleInPlane(transform, visiblePoints[i].position, transform.up);
 			if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
 				RaycastHit hit;
-				// if there is any colider in the way to the player, the gameObject looks at the player
 				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit,
-				                    (visiblePoints[i].position - transform.position).magnitude + 1)) {
+				                    (visiblePoints[i].position - transform.position).magnitude)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						if (hit.transform.Find("visiblePoints").GetComponent<Visibility>().isVisible) {
-							return true;
-						}
+						sensedIntensity += visiblePoints[i].GetComponent<VisibilityPoint>().localIntensity
+										   / Mathf.Pow((visiblePoints[i].position - transform.position).magnitude, 2);;
 					}
 				}
 			}
 		}
-		return false;
+		return sensedIntensity;
 	}
 
 	// angles relative to a plane
@@ -67,6 +74,7 @@ public class EnemyVision : MonoBehaviour {
 
 	// enables the ability to see the fov of the gameObject
 	void OnDrawGizmosSelected() {
+		float viewRange = 10f;
 		Quaternion leftRayRotation = Quaternion.AngleAxis(-fovHor / 2, transform.up);
 		Quaternion rightRayRotation = Quaternion.AngleAxis(fovHor / 2, transform.up);
 		Quaternion topRayRotation = Quaternion.AngleAxis(-fovVer / 2, transform.right);
@@ -79,6 +87,16 @@ public class EnemyVision : MonoBehaviour {
 		Gizmos.DrawRay(transform.position, rightRayDirection * viewRange);
 		Gizmos.DrawRay(transform.position, topRayDirection * viewRange);
 		Gizmos.DrawRay(transform.position, downRayDirection * viewRange);
+	}
+
+	int childCount(Transform GO) {
+		int childCount = 0;
+		for (int i = 0; i < GO.childCount; i++) {
+			if (GO.GetChild(i).gameObject.activeSelf) {
+				childCount++;
+			}
+		}
+		return childCount;
 	}
 
 	void debugGUI(string element, float value) {
