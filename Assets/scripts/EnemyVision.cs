@@ -6,11 +6,7 @@ public class EnemyVision : MonoBehaviour {
 	public float fovHor = 70;
 	public float fovVer	= 50;
 	public float viewRange = 10;
-	public float lookAroundSpeed = 10;
-	public float regard = 150f;
-	//factor of alertness-increase when this sense is trigered
-	public float lookDirAcc = 1f;
-	// comparison value in degree, when the enemy looks in the direction of last trigger
+	public float regard = 150f; //factor of alertness-increase when this sense is trigered
 	private Transform[] PlayerArr;
 	private bool[] noticedPlayer;
 	private Quaternion lookDir;
@@ -30,7 +26,9 @@ public class EnemyVision : MonoBehaviour {
 				transform.parent.GetComponent<EnemyBrain>().senseTrigger(regard);
 			}
 		}
-		handleLookAt(ref PlayerArr, ref noticedPlayer, ref lookDir, ref transform.parent.GetComponent<EnemyBrain>().senseState, EnemyBrain.SENSESTATE.SEEING);
+		transform.parent.GetComponent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
+		             													 ref transform.parent.GetComponent<EnemyBrain>().senseState,
+		                                                                 EnemyBrain.SENSESTATE.SEEING);
 	}
 
 	bool noticedPlayerCheck(Transform Player) {
@@ -42,7 +40,8 @@ public class EnemyVision : MonoBehaviour {
 			if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
 				RaycastHit hit;
 				// if there is any colider in the way to the player, the gameObject looks at the player
-				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit, (visiblePoints[i].position - transform.position).magnitude + 1)) {
+				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit,
+				                    (visiblePoints[i].position - transform.position).magnitude + 1)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
 						if (hit.transform.Find("visiblePoints").GetComponent<Visibility>().isVisible) {
 							return true;
@@ -54,45 +53,6 @@ public class EnemyVision : MonoBehaviour {
 		return false;
 	}
 
-	// look at the postion of the nearist trigger of the the sense with highest priority
-	public void handleLookAt(ref Transform[] PlayerArr, ref bool[] noticedPlayer, ref Quaternion lookDir, ref EnemyBrain.SENSESTATE senseState, EnemyBrain.SENSESTATE thisSense) {
-		bool allFalse = true;
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			if (noticedPlayer[i]) {
-				allFalse = false;
-			}
-		}
-		if (!allFalse && thisSense >= senseState) {
-			senseState = thisSense;
-			lookDir = lastLocDir(PlayerArr, noticedPlayer);
-		}
-		if (senseState == thisSense) {
-			transform.parent.rotation = Quaternion.Slerp(transform.rotation, lookDir, Time.deltaTime * lookAroundSpeed);
-		}
-		if (allFalse && Quaternion.Angle(lookDir, transform.rotation) < lookDirAcc) {
-			senseState = EnemyBrain.SENSESTATE.NONE;
-		}
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			noticedPlayer[i] = false;
-		}
-	}
-
-	// returns the rotation towards the next player who triggered a sense
-	public Quaternion lastLocDir(Transform[] PlayerArr, bool[] noticedPlayer) {
-		Vector3 minDistLoc = Vector3.zero;
-		float minDist = -1;
-		for (int i = 0; i < PlayerArr.Length; i++) {
-			if (noticedPlayer[i] && minDist == -1) {
-				minDistLoc = PlayerArr[i].position;
-			}
-			if (noticedPlayer[i] && (PlayerArr[i].position - transform.position).magnitude < minDist) {
-				minDistLoc = PlayerArr[i].position;
-				minDist = (minDistLoc - transform.position).magnitude;
-			}
-		}
-		return Quaternion.LookRotation(minDistLoc - transform.position);
-	}
-		
 	// angles relative to a plane
 	public float angleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
 		Vector3 dir = to - from.position;
