@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyBrain : MonoBehaviour {
 	[HideInInspector] public enum SENSESTATE {
@@ -14,9 +15,8 @@ public class EnemyBrain : MonoBehaviour {
 	/*
 	 * NONE: the Enemy is not alerted
 	 * RUMORS: another Enemy reached ALERTNESS1 and transmitted the info
-	 * ALERTNESS1: the Enemy heart or saw something
-	 * ALERTNESS2: another Enemy reached ALERTNESS3
-	 * ALERTNESS3: the Enemy heart or saw the Player 
+	 * ALERTNESS1: the Enemy got triggered
+	 * ALERTNESS2: an trigger gained full attention
 	 */
 	[HideInInspector] public enum ALERTSTATE {
 		NONE,
@@ -46,9 +46,7 @@ public class EnemyBrain : MonoBehaviour {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			handleHighAlertReaction();
 		}
-		debugGUI("alertness E" + enemyIndex.ToString(), alertness);
-		debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
-		debugGUI("SENSESTATE E" + enemyIndex.ToString(), (float)senseState);
+		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
 	}
 
 	// is called from a Sense script
@@ -75,15 +73,12 @@ public class EnemyBrain : MonoBehaviour {
 		}
 	}
 
+	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
 		if (alertState == ALERTSTATE.ALERTNESS1) {
 			
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
-			
+			SceneManager.LoadScene("fightInitiation");
 		}
-	}
-
-	void debugGUI(string element, float value) {
-		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }

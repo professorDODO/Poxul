@@ -5,8 +5,9 @@ using UnityEngine;
 public class MovementSound : MonoBehaviour {
 
 	public int soundPow = 4;
+	public float minVelocity = 0.1f;
 	private Rigidbody rb;
-	private AudioSource audio;
+	private new AudioSource audio;
 
 	void Awake() {
 		audio = GetComponent<AudioSource>();
@@ -14,8 +15,16 @@ public class MovementSound : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!audio.isPlaying) {
-			audio.Play();
+		walkingSound();
+	}
+
+	void walkingSound() {
+		if (new Vector3(rb.velocity.x, 0, rb.velocity.z).magnitude >= minVelocity) {
+			if (!audio.isPlaying) {
+				audio.Play();
+			}
+		} else {
+			audio.Stop();
 		}
 		// percentage of Speed influences the sound volume
 		audio.volume = Mathf.Pow(new Vector3(rb.velocity.x, 0, rb.velocity.z).magnitude / GetComponent<Movement>().maxSpeed, soundPow);
