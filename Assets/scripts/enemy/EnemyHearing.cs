@@ -38,11 +38,8 @@ public class EnemyHearing : MonoBehaviour {
 		                                         						 EnemyBrain.SENSESTATE.HEARING);
 	}
 
+	// returns the heard volume depending on the distance
 	float listeningVolume(Transform Player, AudioSource audioPlayer) {
 		return 1 / (Player.position - transform.position).magnitude * audioPlayer.volume;
-	}
-
-	void debugGUI(string element, float value) {
-		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }

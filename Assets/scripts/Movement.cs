@@ -35,7 +35,7 @@ public class Movement : MonoBehaviour {
 			} else {
 				ssFac = 1;
 			}
-			debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
+			Global.debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
 		}
 		// if there is no input, the player "slides" till it stops
 		if (XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex) == 0 && XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex) == 0) {
@@ -56,10 +56,6 @@ public class Movement : MonoBehaviour {
 		if (lsX != 0 && lsY != 0) {
 			transform.rotation = Quaternion.LookRotation(rightDir * lsX + forwardDir * lsY);
 		}
-	}
-
-	void debugGUI(string element, float value) {
-		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
 	}
 }
 

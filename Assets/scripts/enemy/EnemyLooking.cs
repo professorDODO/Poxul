@@ -8,8 +8,10 @@ public class EnemyLooking : MonoBehaviour {
 	public float idleLookAngle = 75f;
 	public float idleLookSpeedFac = 5f;
 	private Quaternion defaultRotation;
+	private Quaternion newDefaultRotation;
 	private Quaternion aimedRotation;
 	private bool lr;
+	private bool defaultRotationChanged = false;
 
 	void Start() {
 		defaultRotation = transform.rotation;
@@ -18,23 +20,37 @@ public class EnemyLooking : MonoBehaviour {
 	}
 
 	void Update() {
-		lookAround();
+		handleLooking();
+	}
+
+	void handleLooking() {
+		if (GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
+			if (defaultRotationChanged) {
+				defaultRotation = newDefaultRotation;
+				transform.rotation = Quaternion.Slerp(transform.rotation, defaultRotation, Time.deltaTime * lookSpeed);
+				if (Quaternion.Angle(transform.rotation, newDefaultRotation) <= lookDirAcc) {
+					defaultRotationChanged = false;
+					aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
+					lr = true;
+				}
+			} else {
+				lookAround();
+			}
+		}
 	}
 
 	void lookAround() {
-		if (GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
-			if (Quaternion.Angle(aimedRotation, transform.rotation) < lookDirAcc) {
-				if (lr) {
-					aimedRotation = defaultRotation * Quaternion.Inverse(Quaternion.Euler(0, idleLookAngle, 0));
-				} else {
-					aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
-				}
-				lr = !lr;
+		if (Quaternion.Angle(aimedRotation, transform.rotation) < lookDirAcc) {
+			if (lr) {
+				aimedRotation = defaultRotation * Quaternion.Inverse(Quaternion.Euler(0, idleLookAngle, 0));
 			} else {
-				transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
-				                                      lookSpeed * idleLookSpeedFac * Time.deltaTime
-				                                      / (Quaternion.Angle(transform.rotation, aimedRotation)));
+				aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
 			}
+			lr = !lr;
+		} else {
+			transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
+			                                      lookSpeed * idleLookSpeedFac * Time.deltaTime
+			                                      / (Quaternion.Angle(transform.rotation, aimedRotation)));
 		}
 	}
 
@@ -56,7 +72,8 @@ public class EnemyLooking : MonoBehaviour {
 		}
 		if (allFalse && Quaternion.Angle(lookDir, transform.rotation) < lookDirAcc) {
 			senseState = EnemyBrain.SENSESTATE.NONE;
-		}		for (int i = 0; i < noticedPlayer.Length; i++) {
+		}
+		for (int i = 0; i < noticedPlayer.Length; i++) {
 			noticedPlayer[i] = false;
 		}
 	}
@@ -76,6 +93,9 @@ public class EnemyLooking : MonoBehaviour {
 		}
 		return Quaternion.LookRotation(minDistLoc - transform.position);
 	}
-}
 
-//Prevent the Enemy from getting stuck at looking at the opposite direction!!
+	public void changeDefaultRotation(Quaternion newDefaultRot) {
+		newDefaultRotation = newDefaultRot;
+		defaultRotationChanged = true;
+	}
+}

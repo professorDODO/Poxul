@@ -49,8 +49,8 @@ public class MainCamera : MonoBehaviour {
 		//zoom out
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			//checking if a player is outside of the view of the camera
-			float vertical = AngleInPlane(transform, PlayerArr[i].position, transform.right);
-			float horizontal = AngleInPlane(transform, PlayerArr[i].position, transform.up);
+			float vertical = Global.angleInPlane(transform, PlayerArr[i].position, transform.right);
+			float horizontal = Global.angleInPlane(transform, PlayerArr[i].position, transform.up);
 			if (horizontal > fovHorZoomOut) {
 				transform.LookAt(middle);
 				transform.position -= transform.forward.normalized * (PlayerArr[i].position - transform.position).magnitude
@@ -76,8 +76,8 @@ public class MainCamera : MonoBehaviour {
 			playerMaxAngleVerIndex = 0;
 		} else {
 			for (int i = 0; i < PlayerArr.Length; ++i) {
-				float vertical = AngleInPlane(transform, PlayerArr[i].position, transform.right);
-				float horizontal = AngleInPlane(transform, PlayerArr[i].position, transform.up);
+				float vertical = Global.angleInPlane(transform, PlayerArr[i].position, transform.right);
+				float horizontal = Global.angleInPlane(transform, PlayerArr[i].position, transform.up);
 				if (vertical > maxAngleVer) {
 					maxAngleVer = vertical;
 					playerMaxAngleVerIndex = i;
@@ -93,11 +93,11 @@ public class MainCamera : MonoBehaviour {
 			//check if a Player is nearer to the top or the sides, to determine which Angle should be respected when zooming
 			if (maxAngleVer / fovVerZoomIn >= maxAngleHor / fovHorZoomIn) {
 				transform.position -= transform.forward.normalized * (PlayerArr[playerMaxAngleVerIndex].position - transform.position).magnitude
-				* Mathf.Sin(Mathf.PI / 180 * (AngleInPlane(transform, PlayerArr[playerMaxAngleVerIndex].position, transform.right) - fovVerZoomIn))
+					* Mathf.Sin(Mathf.PI / 180 * (Global.angleInPlane(transform, PlayerArr[playerMaxAngleVerIndex].position, transform.right) - fovVerZoomIn))
 				/ Mathf.Sin(Mathf.PI / 180 * fovVerZoomIn);
 			} else {
 				transform.position -= transform.forward.normalized * (PlayerArr[playerMaxAngleHorIndex].position - transform.position).magnitude
-				* Mathf.Sin(Mathf.PI / 180 * (AngleInPlane(transform, PlayerArr[playerMaxAngleHorIndex].position, transform.up) - fovHorZoomIn))
+					* Mathf.Sin(Mathf.PI / 180 * (Global.angleInPlane(transform, PlayerArr[playerMaxAngleHorIndex].position, transform.up) - fovHorZoomIn))
 				/ Mathf.Sin(Mathf.PI / 180 * fovHorZoomIn);
 			}
 		}
@@ -113,17 +113,5 @@ public class MainCamera : MonoBehaviour {
 		}
 		// focus camera at mid point between players
 		transform.LookAt(middle);
-	}
-
-	// Angles relative in a plane
-	public float AngleInPlane(Transform from, Vector3 to, Vector3 planeNormal) {
-		Vector3 dir = to - from.position;
-		Vector3 p1 = Project(dir, planeNormal);
-		Vector3 p2 = Project(from.forward, planeNormal);
-		return Vector3.Angle(p1, p2);
-	}
-
-	public Vector3 Project(Vector3 v, Vector3 onto) {
-		return v - (Vector3.Dot(v, onto) / Vector3.Dot(onto, onto)) * onto;
 	}
 }
