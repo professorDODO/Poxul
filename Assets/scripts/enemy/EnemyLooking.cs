@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyLooking : MonoBehaviour {
 	public float lookSpeed = 10f;
 	public float lookDirAcc = 1f; // comparison value in degree, when the enemy looks in the direction of last trigger
+	public bool idleLooking = false;
 	public float idleLookAngle = 75f;
 	public float idleLookSpeedFac = 5f;
 	private Quaternion defaultRotation;
@@ -34,7 +35,9 @@ public class EnemyLooking : MonoBehaviour {
 					lr = true;
 				}
 			} else {
-				lookAround();
+				if (idleLooking) {
+					lookAround();
+				}
 			}
 		}
 	}
