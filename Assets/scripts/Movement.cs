@@ -58,7 +58,7 @@ public class Movement : MonoBehaviour {
 		} else {
 			ssFac = 1;
 		}
-			debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
+			Global.debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
 		// jump
 		if (lastJumpPrep && !jumpPrep && isGrounded) {
 			rb.AddForce (new Vector3 (0, jumpBuildUp, 0));
@@ -87,11 +87,6 @@ public class Movement : MonoBehaviour {
 		lastJumpPrep = jumpPrep;
 		Debug.Log (isGrounded);
 	}
-
-	void debugGUI(string element, float value) {
-		GameObject.Find("GUI").GetComponent<debugGUI>().debugElement(element, value);
-	}
-
 }
 
 
