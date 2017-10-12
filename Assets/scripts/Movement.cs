@@ -22,6 +22,7 @@ public class Movement : MonoBehaviour {
 	float lsY;
 	bool jumpPrep;
 	bool lastJumpPrep;
+	public bool jumping;
 	[HideInInspector]
 	public bool isGrounded;
 	[HideInInspector]
@@ -41,9 +42,11 @@ public class Movement : MonoBehaviour {
 			sneak = !sneak;
 		}
 		jumpPrep = XCI.GetButton (XboxButton.A, (XboxController)playerIndex);
-		if(jumpPrep && jumpBuildUp < jumpForce){
+		if (jumpPrep && jumpBuildUp < jumpForce) {
 			jumpBuildUp += jumpForce * jumpCharge * Time.deltaTime;
-			//trajec.GetComponent<Trajectory>().RenderTrajectory ();
+		}
+		if(jumpPrep || lastJumpPrep){
+			trajec.GetComponent<Trajectory>().RenderTrajectory (new Vector3(rb.velocity.x, jumpBuildUp * Time.fixedDeltaTime / rb.mass, rb.velocity.z));
 		}
 	}
 
@@ -60,12 +63,9 @@ public class Movement : MonoBehaviour {
 		}
 			Global.debugGUI("sneak P" + playerIndex.ToString(), sneak ? 1 : 0);
 		// jump
-		if (lastJumpPrep && !jumpPrep && isGrounded) {
-			rb.AddForce (new Vector3 (0, jumpBuildUp, 0));
-			jumpBuildUp = 0;
-		} else if(isGrounded){
+		if (isGrounded && !jumping) {
 			// if there is no input, the player "slides" till it stops
-				if (lsX == 0 && lsY == 0) {
+			if (lsX == 0 && lsY == 0) {
 				rb.velocity = new Vector3(rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
 			} else {
 				// ḿoving in given direction
@@ -84,8 +84,17 @@ public class Movement : MonoBehaviour {
 				transform.rotation = Quaternion.LookRotation(rightDir * lsX + forwardDir * lsY);
 			}
 		}
+		//if(jumpPrep || lastJumpPrep){
+		//	trajec.GetComponent<Trajectory>().RenderTrajectory (new Vector3(rb.velocity.x, jumpBuildUp * Time.fixedDeltaTime / rb.mass, rb.velocity.z));
+		//}
+		if(lastJumpPrep && !jumpPrep && isGrounded){
+			rb.AddForce (new Vector3 (0, jumpBuildUp, 0));
+			jumping = true;
+			jumpBuildUp = 0;
+		}
 		lastJumpPrep = jumpPrep;
-		Debug.Log (isGrounded);
+		Debug.Log (jumping);
+		Debug.Log (rb.velocity);
 	}
 }
 

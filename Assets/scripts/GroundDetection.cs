@@ -16,13 +16,17 @@ public class GroundDetection : MonoBehaviour {
 		
 	}
 
-	void OnTriggerExit(){
-		player.GetComponent<Movement> ().isGrounded = false;
+	void OnTriggerEnter(){
+		player.GetComponent<Movement> ().jumping = false;
 	}
 
 	void OnTriggerStay(Collider other){
 		if(other.gameObject.layer != LayerMask.NameToLayer("Player")){
 			player.GetComponent<Movement> ().isGrounded = true;
 		}
+	}
+
+	void OnTriggerExit(){
+		player.GetComponent<Movement> ().isGrounded = false;
 	}
 }

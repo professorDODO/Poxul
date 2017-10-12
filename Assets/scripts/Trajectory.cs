@@ -5,11 +5,15 @@ using UnityEngine;
 public class Trajectory : MonoBehaviour {
 
 	public GameObject trajPoint;
+	[SerializeField]
+	int numPoints;
+	LineRenderer path;
 
 	// Use this for initialization
 	void Start () {
-		//test
-		//RenderTrajectory(5, 2);
+		path = gameObject.GetComponent<LineRenderer> ();
+		path.SetVertexCount (numPoints);
+		path.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -17,11 +21,14 @@ public class Trajectory : MonoBehaviour {
 		
 	}
 
-	public void RenderTrajectory(float hor, float ver){
-		for(int iii = 0; iii <= hor; iii++){
-			Vector3 position = transform.up * (-(4 * ver / (hor * hor)) * Mathf.Pow ((iii - (hor / 2)), 2) + ver) + transform.forward * iii;
-			GameObject traj = Instantiate (trajPoint, this.transform) as GameObject;
-			traj.transform.position = transform.position + position;
+	public void RenderTrajectory(Vector3 startVelo){
+		path.enabled = true;
+		Vector3 position = transform.position;
+		Vector3 velo = startVelo;
+		for(int iii = 0; iii <= numPoints; iii++){
+			path.SetPosition (iii, position);
+			velo += Physics.gravity * Time.fixedDeltaTime;
+			position += velo * Time.fixedDeltaTime;
 		}
 	}
 }
