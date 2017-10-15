@@ -7,9 +7,7 @@ public class EnemyBrain : MonoBehaviour {
 	[HideInInspector] public enum SENSESTATE {
 		NONE,
 		HEARING,
-		SEEING}
-
-	;
+		SEEING};
 	// sorted in proirity order
 	[HideInInspector] public SENSESTATE senseState;
 	/*
@@ -46,8 +44,6 @@ public class EnemyBrain : MonoBehaviour {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			handleHighAlertReaction();
 		}
-		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
-		Global.debugGUI("SENSESTATE E" + enemyIndex.ToString(), (float)senseState);
 	}
 
 	// is called from a Sense script

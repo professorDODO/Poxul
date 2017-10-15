@@ -7,9 +7,7 @@ public class EnemyLooking : MonoBehaviour {
 		NONE,
 		IDLE,
 		RETURN2IDLE,
-		TRIGGERED}
-
-	;
+		TRIGGERED};
 	// sorted in proirity order
 	[HideInInspector] public LOOKSTATE lookState;
 	private Transform Self;
@@ -32,11 +30,13 @@ public class EnemyLooking : MonoBehaviour {
 	}
 
 	void handleLooking() {
-		if (lookState == LOOKSTATE.RETURN2IDLE) {
-			return2Idle();
-		}
-		if (lookState == LOOKSTATE.IDLE) {
-			idleLooking();
+		if (Self.GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
+			if (lookState == LOOKSTATE.RETURN2IDLE) {
+				return2Idle();
+			}
+			if (lookState == LOOKSTATE.IDLE) {
+				idleLooking();
+			}
 		}
 	}
 

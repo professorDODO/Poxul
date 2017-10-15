@@ -35,6 +35,7 @@ public class EnemyVision : MonoBehaviour {
 		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
 		             										 	ref Self.GetComponent<EnemyBrain>().senseState,
 		                                                     	EnemyBrain.SENSESTATE.SEEING);
+		Global.debugGUI("noticedIntensity E" + Self.GetComponent<EnemyBrain>().enemyIndex.ToString(), noticedIntesity(PlayerArr[0]));
 	}
 
 	// returns the sum of all intensities depending on the distance of the, for the enemy visible, visibilityPoints of a Player
@@ -49,8 +50,8 @@ public class EnemyVision : MonoBehaviour {
 			float horizontal = Global.angleInPlane(transform, visiblePoints[i].position, transform.up);
 			if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
 				RaycastHit hit;
-				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit,
-				                    (visiblePoints[i].position - transform.position).magnitude)) {
+				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit)) {
+					Debug.Log(hit.transform.name);
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
 						// 1/distance^2 as an weight
 						sensedIntensity += visiblePoints[i].GetComponent<VisibilityPoint>().localIntensity
