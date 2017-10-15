@@ -9,7 +9,10 @@ public class MovementToMerge : MonoBehaviour {
 	public float moveForce = 50;
 	public float maxSpeed = 10;
 	public float sneakSpeedFac = 0.5f;
+	public float rotationSpeed = 10f;
 
+	private Vector3 forwardDir = Vector3.forward;
+	private Vector3 rightDir = Vector3.right;
 	private bool sneak;
 	private float ssFac;
 
@@ -21,8 +24,6 @@ public class MovementToMerge : MonoBehaviour {
 
 	public void move(float xDir, float yDir, bool rel2Cam) {
 		// enables movement relative to the camera angle
-		Vector3 forwardDir = Vector3.forward;
-		Vector3 rightDir = Vector3.right;
 		if (rel2Cam) {
 			forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
 			rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
@@ -45,6 +46,21 @@ public class MovementToMerge : MonoBehaviour {
 		// player looks in movement direction
 		if (rel2Cam && xDir != 0 && yDir != 0) {
 			transform.rotation = Quaternion.LookRotation(rightDir * xDir + forwardDir * yDir);
+		}
+	}
+
+	public void rotate(float xDir, float yDir, bool rel2Cam) {
+		// enables movement relative to the camera angle
+		if (rel2Cam) {
+			forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
+			rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
+		}
+		Quaternion aimedRotation = new Quaternion();
+		if ((rightDir * xDir + forwardDir * yDir).magnitude != 0f) {
+			aimedRotation = Quaternion.LookRotation(rightDir * xDir + forwardDir * yDir);
+			transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
+			                                     rotationSpeed * Time.deltaTime
+			                                     / (Quaternion.Angle(transform.rotation, aimedRotation)));
 		}
 	}
 

@@ -23,6 +23,12 @@ public class PathFinding : MonoBehaviour {
 	}
 
 	void Update() {
+		if (navState == NAVSTATE.NAVIGATE) {
+			executeNavigation();
+		}
+	}
+
+	private void executeNavigation(){
 		float xDir = (new Vector3(navAgent.desiredVelocity.x, 0, navAgent.desiredVelocity.z)).normalized.x;
 		float yDir = (new Vector3(navAgent.desiredVelocity.x, 0, navAgent.desiredVelocity.z)).normalized.z;
 		Movement.move(xDir, yDir, false);
@@ -31,15 +37,7 @@ public class PathFinding : MonoBehaviour {
 			Movement.move(-xDir, -yDir, false);
 			navState = NAVSTATE.REACHEDGOAL;
 		}
-		if (navState == NAVSTATE.NAVIGATE) {
-			GetComponent<EnemyLooking>().changeDefaultRotation(Quaternion.LookRotation(navAgent.destination
-			                                                                           - transform.position),
-			                                                   false);
-		}
-
-		// TODO: Slowing Down before reaching the Goal
-
-		Global.debugGUI("NAVSTATE", (float)navState);
+		Movement.rotate(xDir, yDir, false);
 		navAgent.nextPosition = transform.position;
 	}
 
@@ -48,3 +46,5 @@ public class PathFinding : MonoBehaviour {
 		navAgent.destination = destination;
 	}
 }
+
+// TODO: Slowing Down before reaching the Goal

@@ -28,9 +28,6 @@ public class EnemyPatrolingPath : MonoBehaviour {
 		}
 		if (GetComponent<PathFinding>().navState == PathFinding.NAVSTATE.NONE) {
 			GetComponent<PathFinding>().navigateTo(WayPnts[nextWayPntIndex].position);
-			GetComponent<EnemyLooking>().changeDefaultRotation(Quaternion.LookRotation(WayPnts[nextWayPntIndex].position
-			                                                                           - transform.position),
-			                                                   true);
 		}
 	}
 }

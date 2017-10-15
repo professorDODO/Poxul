@@ -7,12 +7,14 @@ public class EnemyVision : MonoBehaviour {
 	public float fovVer	= 50;
 	public float intensityThreshhold = 15f;
 	public float regard = 150f; //factor of alertness-increase when this sense is trigered
+	private Transform Self;
 	private Transform[] PlayerArr;
 	private bool[] noticedPlayer;
 	private Quaternion lookDir;
 
-	void Start() {
-		PlayerArr = transform.parent.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+	void Awake() {
+		Self = transform.parent.parent;
+		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
 		lookDir = transform.rotation;
 	}
 
@@ -27,12 +29,12 @@ public class EnemyVision : MonoBehaviour {
 		}
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			if (noticedPlayer[i]) {
-				transform.parent.GetComponent<EnemyBrain>().senseTrigger(regard);
+				Self.GetComponent<EnemyBrain>().senseTrigger(regard);
 			}
 		}
-		transform.parent.GetComponent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
-		             													 ref transform.parent.GetComponent<EnemyBrain>().senseState,
-		                                                                 EnemyBrain.SENSESTATE.SEEING);
+		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
+		             										 	ref Self.GetComponent<EnemyBrain>().senseState,
+		                                                     	EnemyBrain.SENSESTATE.SEEING);
 	}
 
 	// returns the sum of all intensities depending on the distance of the, for the enemy visible, visibilityPoints of a Player

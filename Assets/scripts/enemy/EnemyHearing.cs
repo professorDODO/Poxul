@@ -5,15 +5,16 @@ using UnityEngine;
 public class EnemyHearing : MonoBehaviour {
 	//public Transform Player;
 	public float soundVolumeRecognition = 0.04f;
-	private AudioSource[] audioPlayer;
-	public float regard = 50f;
-	//factor of alertness-increase when this sense is trigered
+	public float regard = 50f; //factor of alertness-increase when this sense is trigered
+	private Transform Self;
 	private Transform[] PlayerArr;
+	private AudioSource[] audioPlayer;
 	private bool[] noticedPlayer;
 	private Quaternion lookDir;
 
 	void Awake() {
-		PlayerArr = transform.parent.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		Self = transform.parent.parent;
+		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
 		audioPlayer = new AudioSource[PlayerArr.Length];
 		for (int i = 0; i < audioPlayer.Length; i++) {
 			audioPlayer[i] = PlayerArr[i].GetComponent<AudioSource>(); 
@@ -28,14 +29,14 @@ public class EnemyHearing : MonoBehaviour {
 		noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i], audioPlayer[i]) >= soundVolumeRecognition) {
-				transform.parent.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i], audioPlayer[i])
+				Self.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i], audioPlayer[i])
 				                                                         / soundVolumeRecognition * regard);
 				noticedPlayer[i] = true;
 			}
 		}
-		transform.parent.GetComponent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
-		                                         						 ref transform.parent.GetComponent<EnemyBrain>().senseState,
-		                                         						 EnemyBrain.SENSESTATE.HEARING);
+		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
+		                                         				ref Self.GetComponent<EnemyBrain>().senseState,
+		                                         				EnemyBrain.SENSESTATE.HEARING);
 	}
 
 	// returns the heard volume depending on the distance
