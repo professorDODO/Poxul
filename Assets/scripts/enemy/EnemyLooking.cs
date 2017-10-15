@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyLooking : MonoBehaviour {
+	[HideInInspector] public enum LOOKSTATE {
+		NONE,
+		IDLE,
+		RETURN2IDLE,
+		TRIGGERED}
+
+	;
+	// sorted in proirity order
+	[HideInInspector] public LOOKSTATE lookState;
 	private Transform Self;
 	public float lookSpeed = 10f;
 	public float lookDirAcc = 1f; // comparison value in degree, when the enemy looks in the direction of last trigger
@@ -12,6 +21,7 @@ public class EnemyLooking : MonoBehaviour {
 	private bool lr;
 
 	void Awake() {
+		lookState = LOOKSTATE.IDLE;
 		Self = transform.parent;
 		aimedRotation = Quaternion.Euler(0, idleLookAngle, 0);
 		lr = true;
@@ -21,11 +31,20 @@ public class EnemyLooking : MonoBehaviour {
 		handleLooking();
 	}
 
-	//TODO: clean up the mess with default rotation
-
 	void handleLooking() {
-		if (Self.GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
+		if (lookState == LOOKSTATE.RETURN2IDLE) {
+			return2Idle();
+		}
+		if (lookState == LOOKSTATE.IDLE) {
 			idleLooking();
+		}
+	}
+
+	void return2Idle(){
+		if (Quaternion.Angle(Self.rotation, transform.rotation) > lookDirAcc) {
+			transform.rotation = Quaternion.Slerp(transform.rotation, Self.rotation, lookSpeed * Time.deltaTime);
+		} else {
+			lookState = LOOKSTATE.IDLE;
 		}
 	}
 
@@ -54,12 +73,14 @@ public class EnemyLooking : MonoBehaviour {
 		}
 		if (!allFalse && thisSense >= senseState) {
 			senseState = thisSense;
+			lookState = LOOKSTATE.TRIGGERED;
 			lookDir = lastLocDir(PlayerArr, noticedPlayer);
 		}
 		if (senseState == thisSense) {
 			transform.rotation = Quaternion.Slerp(transform.rotation, lookDir, Time.deltaTime * lookSpeed);
 		}
 		if (allFalse && Quaternion.Angle(lookDir, transform.rotation) < lookDirAcc) {
+			lookState = LOOKSTATE.RETURN2IDLE;
 			senseState = EnemyBrain.SENSESTATE.NONE;
 		}
 		for (int i = 0; i < noticedPlayer.Length; i++) {
