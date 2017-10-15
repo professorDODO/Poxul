@@ -5,8 +5,6 @@ using UnityEngine;
 public class EnemyPatrolingPath : MonoBehaviour {
 	public Transform Path;
 	private Transform[] WayPnts; //TODO: CREATE A SCRIPT ON PATH WHICH OFFERS THE NEXT POINT
-	public float speed = 10f;
-	public float reachPntAcc = 1f;
 	private int nextWayPntIndex = 0;
 
 	void Start() {
@@ -21,17 +19,18 @@ public class EnemyPatrolingPath : MonoBehaviour {
 	}
 
 	void Update () {
-		if ((transform.position - WayPnts[nextWayPntIndex].position).magnitude <= reachPntAcc) {
+		if (GetComponent<PathFinding>().navState == PathFinding.NAVSTATE.REACHEDGOAL) {
 			nextWayPntIndex++;
 			if (nextWayPntIndex > WayPnts.Length - 1) {
 				nextWayPntIndex = 0;
 			}
-			transform.GetComponent<EnemyLooking>().changeDefaultRotation(Quaternion.LookRotation(WayPnts[nextWayPntIndex].position - transform.position));
+			GetComponent<PathFinding>().navState = PathFinding.NAVSTATE.NONE;
 		}
-		moveTo(nextWayPntIndex);	
-	}
-
-	void moveTo(int i) {
-		transform.position = Vector3.MoveTowards(transform.position, WayPnts[i].position, speed * Time.deltaTime);
+		if (GetComponent<PathFinding>().navState == PathFinding.NAVSTATE.NONE) {
+			GetComponent<PathFinding>().navigateTo(WayPnts[nextWayPntIndex].position);
+			GetComponent<EnemyLooking>().changeDefaultRotation(Quaternion.LookRotation(WayPnts[nextWayPntIndex].position
+			                                                                           - transform.position),
+			                                                   true);
+		}
 	}
 }

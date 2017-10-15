@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyLooking : MonoBehaviour {
+	[HideInInspector] public enum LOOKSTATE {
+		NONE,
+		IDLE,
+		SENSETRIGGER};
+	[HideInInspector] public LOOKSTATE lookState;
 	public float lookSpeed = 10f;
 	public float lookDirAcc = 1f; // comparison value in degree, when the enemy looks in the direction of last trigger
-	public bool idleLooking = false;
 	public float idleLookAngle = 75f;
 	public float idleLookSpeedFac = 5f;
 	private Quaternion defaultRotation;
-	private Quaternion newDefaultRotation;
 	private Quaternion aimedRotation;
 	private bool lr;
-	private bool defaultRotationChanged = false;
+	private bool forcedRotationChange = false;
 
 	void Start() {
+		lookState = LOOKSTATE.NONE;
 		defaultRotation = transform.rotation;
 		aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
 		lr = true;
@@ -24,37 +28,39 @@ public class EnemyLooking : MonoBehaviour {
 		handleLooking();
 	}
 
+	//TODO: clean up the mess with default rotation
+
 	void handleLooking() {
 		if (GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.NONE) {
-			if (defaultRotationChanged) {
-				defaultRotation = newDefaultRotation;
+			if (forcedRotationChange) {
 				transform.rotation = Quaternion.Slerp(transform.rotation, defaultRotation, Time.deltaTime * lookSpeed);
-				if (Quaternion.Angle(transform.rotation, newDefaultRotation) <= lookDirAcc) {
-					defaultRotationChanged = false;
+				if (Quaternion.Angle(transform.rotation, defaultRotation) <= lookDirAcc) {
+					forcedRotationChange = false;
 					aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
 					lr = true;
 				}
 			} else {
-				if (idleLooking) {
-					lookAround();
+				if (lookState == LOOKSTATE.IDLE) {
+					idleLooking();
 				}
 			}
 		}
 	}
 
-	void lookAround() {
+	void idleLooking() {
+		Quaternion aimedPortion = new Quaternion();
 		if (Quaternion.Angle(aimedRotation, transform.rotation) < lookDirAcc) {
 			if (lr) {
-				aimedRotation = defaultRotation * Quaternion.Inverse(Quaternion.Euler(0, idleLookAngle, 0));
+				aimedPortion = Quaternion.Inverse(Quaternion.Euler(0, idleLookAngle, 0));
 			} else {
-				aimedRotation = defaultRotation * Quaternion.Euler(0, idleLookAngle, 0);
+				aimedPortion = Quaternion.Euler(0, idleLookAngle, 0);
 			}
 			lr = !lr;
-		} else {
-			transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
-			                                      lookSpeed * idleLookSpeedFac * Time.deltaTime
-			                                      / (Quaternion.Angle(transform.rotation, aimedRotation)));
 		}
+		aimedRotation = defaultRotation * aimedPortion;
+		transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
+		                                      lookSpeed * idleLookSpeedFac * Time.deltaTime
+		                                      / (Quaternion.Angle(transform.rotation, aimedRotation)));
 	}
 
 	// look at the postion of the nearist trigger of the the sense with highest priority
@@ -97,8 +103,10 @@ public class EnemyLooking : MonoBehaviour {
 		return Quaternion.LookRotation(minDistLoc - transform.position);
 	}
 
-	public void changeDefaultRotation(Quaternion newDefaultRot) {
-		newDefaultRotation = newDefaultRot;
-		defaultRotationChanged = true;
+	public void changeDefaultRotation(Quaternion newDefaultRot, bool force) {
+		defaultRotation = newDefaultRot;
+		if (force) {
+			forcedRotationChange = true;
+		}
 	}
 }
