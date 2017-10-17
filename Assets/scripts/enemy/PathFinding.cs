@@ -39,7 +39,6 @@ public class PathFinding : MonoBehaviour {
 			speedCap = ((navAgent.destination - transform.position).magnitude + navAccRadius)
 					   / (breakRadius + navAccRadius);
 		}
-		Global.debugGUI("speedCap E" + GetComponent<EnemyBrain>().enemyIndex.ToString(), speedCap);
 		Movement.move(speedCap * inputVec, false);
 		if ((navAgent.destination - transform.position).magnitude < navAccRadius) {
 			navAgent.destination = transform.position;

@@ -44,6 +44,7 @@ public class EnemyBrain : MonoBehaviour {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			handleHighAlertReaction();
 		}
+		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
 	}
 
 	// is called from a Sense script

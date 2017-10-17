@@ -21,24 +21,25 @@ public class EnemyVision : MonoBehaviour {
 	void Update() {
 		// checking the noticed intensity for each Player
 		noticedPlayer = new bool[PlayerArr.Length];
+		float[] sensedIntensity = new float[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
-			float sensedIntensity = noticedIntesity(PlayerArr[i]);
-			if(sensedIntensity >= intensityThreshhold) {
+			sensedIntensity[i] = noticedIntesity(PlayerArr[i]);
+			if(sensedIntensity[i] >= intensityThreshhold) {
 				noticedPlayer[i] = true;
 			}
 		}
 		for (int i = 0; i < noticedPlayer.Length; i++) {
 			if (noticedPlayer[i]) {
-				Self.GetComponent<EnemyBrain>().senseTrigger(regard);
+				Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity[i] / intensityThreshhold * regard);
 			}
 		}
 		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
 		             										 	ref Self.GetComponent<EnemyBrain>().senseState,
 		                                                     	EnemyBrain.SENSESTATE.SEEING);
-		Global.debugGUI("noticedIntensity E" + Self.GetComponent<EnemyBrain>().enemyIndex.ToString(), noticedIntesity(PlayerArr[0]));
 	}
 
-	// returns the sum of all intensities depending on the distance of the, for the enemy visible, visibilityPoints of a Player
+	// returns the sum of all intensities depending on the distance of the,
+	// for the enemy visible, visibilityPoints of a Player
 	float noticedIntesity(Transform Player) {
 		float sensedIntensity = 0f;
 		Transform[] visiblePoints = new Transform[Global.childCount(Player.Find("visiblePoints"))];
