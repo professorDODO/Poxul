@@ -29,15 +29,16 @@ public class PathFinding : MonoBehaviour {
 	}
 
 	private void executeNavigation(){
-		float xDir = (new Vector3(navAgent.desiredVelocity.x, 0, navAgent.desiredVelocity.z)).normalized.x;
-		float yDir = (new Vector3(navAgent.desiredVelocity.x, 0, navAgent.desiredVelocity.z)).normalized.z;
-		Movement.move(xDir, yDir, false);
+		Vector2 inputVec = new Vector2((new Vector3(navAgent.desiredVelocity.x, 0,
+		                                            navAgent.desiredVelocity.z)).normalized.x,
+		                               (new Vector3(navAgent.desiredVelocity.x, 0,
+		                                            navAgent.desiredVelocity.z)).normalized.z);
+		Movement.move(inputVec, false);
 		if ((navAgent.destination - transform.position).magnitude < navAccRadius) {
 			navAgent.destination = transform.position;
-			Movement.move(-xDir, -yDir, false);
 			navState = NAVSTATE.REACHEDGOAL;
 		}
-		Movement.rotate(xDir, yDir, false);
+		Movement.rotate(inputVec, false);
 		navAgent.nextPosition = transform.position;
 	}
 

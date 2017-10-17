@@ -8,6 +8,7 @@ public class MovementToMerge : MonoBehaviour {
 	public float groundDrag = 0.9f;
 	public float moveForce = 50;
 	public float maxSpeed = 10;
+	private float speedCap;
 	public float sneakSpeedFac = 0.5f;
 	public float rotationSpeed = 10f;
 
@@ -22,42 +23,38 @@ public class MovementToMerge : MonoBehaviour {
 		ssFac = 1;
 	}
 
-	public void move(float xDir, float yDir, bool rel2Cam) {
+	public void move(Vector2 inputVec, bool rel2Cam) {
+		speedCap = maxSpeed * inputVec.magnitude;
 		// enables movement relative to the camera angle
 		if (rel2Cam) {
 			forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
 			rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 		}
 		// if there is no input, the player "slides" till it stops
-		if (xDir == 0 && yDir == 0) {
+		if (inputVec.magnitude == 0f) {
 			rb.velocity = new Vector3(rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
 		} else {
 			// ḿoving in given direction
-			rb.AddForce(rightDir * xDir * moveForce / groundDrag);
-			rb.AddForce(forwardDir * yDir * moveForce / groundDrag);
+			rb.AddForce((rightDir * inputVec.x + forwardDir * inputVec.y).normalized * moveForce / groundDrag);
 		}
 		// reduces the speed to maxSpeed if it goes above
-		if (rb.velocity.magnitude > maxSpeed * ssFac) {
+		if (rb.velocity.magnitude > speedCap * ssFac) {
 			//future: addForce
 			float yVel = rb.velocity.y;
-			rb.velocity = rb.velocity.normalized * maxSpeed * ssFac;
+			rb.velocity = rb.velocity.normalized * speedCap * ssFac;
 			rb.velocity = new Vector3(rb.velocity.x, yVel, rb.velocity.z);
-		}
-		// player looks in movement direction
-		if (rel2Cam && xDir != 0 && yDir != 0) {
-			transform.rotation = Quaternion.LookRotation(rightDir * xDir + forwardDir * yDir);
 		}
 	}
 
-	public void rotate(float xDir, float yDir, bool rel2Cam) {
+	public void rotate(Vector2 inputVec, bool rel2Cam) {
 		// enables movement relative to the camera angle
 		if (rel2Cam) {
 			forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
 			rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 		}
 		Quaternion aimedRotation = new Quaternion();
-		if ((rightDir * xDir + forwardDir * yDir).magnitude != 0f) {
-			aimedRotation = Quaternion.LookRotation(rightDir * xDir + forwardDir * yDir);
+		if (inputVec.magnitude != 0f) {
+			aimedRotation = Quaternion.LookRotation(rightDir * inputVec.x + forwardDir * inputVec.y);
 			transform.rotation = Quaternion.Slerp(transform.rotation, aimedRotation,
 			                                     rotationSpeed * Time.deltaTime
 			                                     / (Quaternion.Angle(transform.rotation, aimedRotation)));

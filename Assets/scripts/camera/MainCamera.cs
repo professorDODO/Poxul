@@ -5,7 +5,7 @@ using XboxCtrlrInput;
 
 public class MainCamera : MonoBehaviour {
 
-	public Transform Player;
+	private Transform Player;
 	public bool invertX;
 	public bool invertY;
 	public float camZoomAccuracy;
@@ -19,6 +19,7 @@ public class MainCamera : MonoBehaviour {
 	private float fovVerZoomOut;
 
 	void Awake() {
+		Player = GetComponentInParent<MiddleLoc>().Player;
 		fovHorZoomIn = Camera.main.fieldOfView * (1 - zoomInOffset);
 		fovHorZoomOut = Camera.main.fieldOfView * (1 - zoomOutOffset);
 		fovVerZoomIn = Camera.main.fieldOfView / Camera.main.aspect * (1 - zoomInOffset);
