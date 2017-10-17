@@ -11,6 +11,7 @@ public class PathFinding : MonoBehaviour {
 	[HideInInspector] public NAVSTATE navState;
 	private MovementToMerge Movement;
 	private NavMeshAgent navAgent;
+	public float breakRadius = 2f;
 	public float navAccRadius = 0.5f;
 
 
@@ -33,7 +34,13 @@ public class PathFinding : MonoBehaviour {
 		                                            navAgent.desiredVelocity.z)).normalized.x,
 		                               (new Vector3(navAgent.desiredVelocity.x, 0,
 		                                            navAgent.desiredVelocity.z)).normalized.z);
-		Movement.move(inputVec, false);
+		float speedCap = 1f;
+		if ((navAgent.destination - transform.position).magnitude < breakRadius + navAccRadius) {
+			speedCap = ((navAgent.destination - transform.position).magnitude + navAccRadius)
+					   / (breakRadius + navAccRadius);
+		}
+		Global.debugGUI("speedCap E" + GetComponent<EnemyBrain>().enemyIndex.ToString(), speedCap);
+		Movement.move(speedCap * inputVec, false);
 		if ((navAgent.destination - transform.position).magnitude < navAccRadius) {
 			navAgent.destination = transform.position;
 			navState = NAVSTATE.REACHEDGOAL;

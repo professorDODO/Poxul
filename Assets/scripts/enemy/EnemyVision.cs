@@ -51,7 +51,6 @@ public class EnemyVision : MonoBehaviour {
 			if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
 				RaycastHit hit;
 				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit)) {
-					Debug.Log(hit.transform.name);
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
 						// 1/distance^2 as an weight
 						sensedIntensity += visiblePoints[i].GetComponent<VisibilityPoint>().localIntensity

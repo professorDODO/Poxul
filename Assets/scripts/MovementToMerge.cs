@@ -38,7 +38,7 @@ public class MovementToMerge : MonoBehaviour {
 			rb.AddForce((rightDir * inputVec.x + forwardDir * inputVec.y).normalized * moveForce / groundDrag);
 		}
 		// reduces the speed to maxSpeed if it goes above
-		if (rb.velocity.magnitude > speedCap * ssFac) {
+		if (new Vector2(rb.velocity.x, rb.velocity.z).magnitude > speedCap * ssFac) {
 			//future: addForce
 			float yVel = rb.velocity.y;
 			rb.velocity = rb.velocity.normalized * speedCap * ssFac;
