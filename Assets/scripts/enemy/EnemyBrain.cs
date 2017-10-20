@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class EnemyBrain : MonoBehaviour {
+	[HideInInspector] public enum TASKSTATE {
+		NONE,
+		LOOKING4TRIGGER,
+		SEARCH};
+	// sorted in proirity order
+	[HideInInspector] public TASKSTATE taskState;
 	[HideInInspector] public enum SENSESTATE {
 		NONE,
 		HEARING,
@@ -20,23 +26,25 @@ public class EnemyBrain : MonoBehaviour {
 		NONE,
 		RUMORS,
 		ALERTNESS1,
-		ALERTNESS2}
-
-	;
+		ALERTNESS2};
 	// sorted in proirity order
 	[HideInInspector] public ALERTSTATE alertState;
 	public Transform Player;
+	public Transform Senses;
+	public Transform Head;
 	public int enemyIndex;
 	public float alertnessStep = 100f;
 	private float alertnessMin = 0f;
 	private float alertnessMax;
 	public float baseAlertnessDecay = 0.1f; // in % of alertnessStep per deltaTime
 	private float alertness = 0f;
+	private int noticedPlayerIndex = -1;
 
-	void Start() {
+	void Awake() {
 		alertnessMax = alertnessStep * (int)ALERTSTATE.ALERTNESS2;
 		senseState = SENSESTATE.NONE;
 		alertState = ALERTSTATE.NONE;
+		taskState = TASKSTATE.NONE;
 	}
 
 	void Update() {
@@ -44,7 +52,12 @@ public class EnemyBrain : MonoBehaviour {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			handleHighAlertReaction();
 		}
-		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), (float)alertState);
+		Global.debugGUI("alertness", alertness);
+	}
+
+	void LateUpdate() {
+		noticedPlayerIndex = -1;
+		senseState = SENSESTATE.NONE;
 	}
 
 	// is called from a Sense script
@@ -73,10 +86,45 @@ public class EnemyBrain : MonoBehaviour {
 
 	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
-		if (alertState == ALERTSTATE.ALERTNESS1) {
-			
-		} else if (alertState == ALERTSTATE.ALERTNESS2) {
-			SceneManager.LoadScene("fightInitiation");
+		if (alertState >= ALERTSTATE.ALERTNESS1) {
+			taskState = TASKSTATE.LOOKING4TRIGGER;
+			/*
+			THERE SHOULD BE A CLEANER VERSION
+			lookatsensetrigger() should return true if the player is visible at the last angle
+			false if there is something blocking it, so moving will be initiated
+			*/
+			if (noticedPlayerIndex != -1) {
+				Head.GetComponent<EnemyLooking>().setTriggerRotation(
+					Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex].position);
+			}
+		} //else if (alertState == ALERTSTATE.ALERTNESS2) {
+			// FIGHT!
+			//SceneManager.LoadScene("fightInitiation");
+		//}
+	}
+
+	public void sensedPlayerIndex(Transform[] PlayerArr, bool[] noticedPlayer) {
+		bool allFalse = true;
+		for (int i = 0; i < noticedPlayer.Length; i++) {
+			if (noticedPlayer[i]) {
+				allFalse = false;
+			}
 		}
+		if (!allFalse) {
+			noticedPlayerIndex = nearestTrigger(PlayerArr, noticedPlayer);
+		} else {
+			
+		}
+	}
+
+	private int nearestTrigger(Transform[] PlayerArr, bool[] noticedPlayer) {
+		float minDist = float.PositiveInfinity;
+		int temp = -1;
+		for (int i = 0; i < PlayerArr.Length; i++) {
+			if (noticedPlayer[i] && (PlayerArr[i].position - transform.position).magnitude < minDist) {
+				temp = i;
+			}
+		}
+		return temp;
 	}
 }

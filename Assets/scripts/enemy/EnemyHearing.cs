@@ -6,37 +6,45 @@ public class EnemyHearing : MonoBehaviour {
 	//public Transform Player;
 	public float soundVolumeRecognition = 0.04f;
 	public float regard = 50f; //factor of alertness-increase when this sense is trigered
+	public bool weightRegardByPlayerNumber = true;
 	private Transform Self;
 	private Transform[] PlayerArr;
 	private AudioSource[] audioPlayer;
-	private bool[] noticedPlayer;
-	private Quaternion lookDir;
+	public bool[] noticedPlayer {get; private set;}
 
 	void Awake() {
 		Self = transform.parent.parent;
 		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		if (weightRegardByPlayerNumber) {
+			regard = regard / PlayerArr.Length;
+		}
 		audioPlayer = new AudioSource[PlayerArr.Length];
 		for (int i = 0; i < audioPlayer.Length; i++) {
 			audioPlayer[i] = PlayerArr[i].GetComponent<AudioSource>(); 
 		}
-	}
-
-	void Start() {
-		lookDir = transform.rotation;
+		noticedPlayer = new bool[PlayerArr.Length];
 	}
 
 	void Update() {
-		noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i], audioPlayer[i]) >= soundVolumeRecognition) {
+				if (EnemyBrain.SENSESTATE.HEARING >= Self.GetComponent<EnemyBrain>().senseState) {
+					noticedPlayer[i] = true;
+					Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.HEARING;
+				}
 				Self.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i], audioPlayer[i])
 				                                                         / soundVolumeRecognition * regard);
-				noticedPlayer[i] = true;
 			}
 		}
-		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
-		                                         				ref Self.GetComponent<EnemyBrain>().senseState,
-		                                         				EnemyBrain.SENSESTATE.HEARING);
+		if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
+			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
+		}
+	}
+		
+	void LateUpdate() {
+		for (int i = 0; i < noticedPlayer.Length; i++) {
+			noticedPlayer[i] = false;
+		}
 	}
 
 	// returns the heard volume depending on the distance

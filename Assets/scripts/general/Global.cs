@@ -33,7 +33,7 @@ public class Global : MonoBehaviour {
 	public static List<string> debugList = new List<string>();
 	public static List<string> debugValList = new List<string>();
 
-	public static void debugGUI(string element, float value) {
+	public static void debugGUI(string element, object value) {
 		if (!debugList.Contains(element)) {
 			debugList.Add(element);
 			debugValList.Add(element + ": " + value.ToString());

@@ -72,7 +72,7 @@ public class MovementToMerge : MonoBehaviour {
 	}
 
 	public void movementDebug() {
-		Global.debugGUI("sneak P" + GetComponent<CharStats>().playerNumber.ToString(), sneak ? 1 : 0);
+		Global.debugGUI("sneak P" + GetComponent<CharStats>().playerNumber.ToString(), sneak);
 	}
 }
 

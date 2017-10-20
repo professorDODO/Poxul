@@ -9,33 +9,36 @@ public class EnemyVision : MonoBehaviour {
 	public float regard = 150f; //factor of alertness-increase when this sense is trigered
 	private Transform Self;
 	private Transform[] PlayerArr;
-	private bool[] noticedPlayer;
-	private Quaternion lookDir;
+	public bool[] noticedPlayer {get; private set;}
 
 	void Awake() {
 		Self = transform.parent.parent;
 		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
-		lookDir = transform.rotation;
+		noticedPlayer = new bool[PlayerArr.Length];
 	}
 
 	void Update() {
 		// checking the noticed intensity for each Player
-		noticedPlayer = new bool[PlayerArr.Length];
 		float[] sensedIntensity = new float[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			sensedIntensity[i] = noticedIntesity(PlayerArr[i]);
 			if(sensedIntensity[i] >= intensityThreshhold) {
 				noticedPlayer[i] = true;
-			}
-		}
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			if (noticedPlayer[i]) {
+				if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
+					Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
+				}
 				Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity[i] / intensityThreshhold * regard);
 			}
 		}
-		GetComponentInParent<EnemyLooking>().LookAtSenseTrigger(ref PlayerArr, ref noticedPlayer, ref lookDir,
-		             										 	ref Self.GetComponent<EnemyBrain>().senseState,
-		                                                     	EnemyBrain.SENSESTATE.SEEING);
+		if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
+			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
+		}
+	}
+
+	void LateUpdate() {
+		for (int i = 0; i < noticedPlayer.Length; i++) {
+			noticedPlayer[i] = false;
+		}
 	}
 
 	// returns the sum of all intensities depending on the distance of the,
