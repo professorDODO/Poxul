@@ -7,6 +7,7 @@ public class EnemyLooking : MonoBehaviour {
 		NONE,
 		IDLE,
 		RETURN2IDLE,
+		SEARCH,
 		TRIGGERED};
 	// sorted in proirity order
 	[HideInInspector] public LOOKSTATE lookState;
@@ -22,9 +23,9 @@ public class EnemyLooking : MonoBehaviour {
 	void Awake() {
 		lookState = LOOKSTATE.IDLE;
 		Self = transform.parent;
+		lr = false;
 		aimedRotation = Quaternion.Euler(0, -idleLookAngle, 0);
 		currentTriggerRot = transform.rotation;
-		lr = false;
 	}
 
 	void Update() {
@@ -73,7 +74,6 @@ public class EnemyLooking : MonoBehaviour {
 		if (Quaternion.Angle(currentTriggerRot, transform.rotation) > lookDirAcc) {
 			transform.rotation = Quaternion.Slerp(transform.rotation, currentTriggerRot, Time.deltaTime * lookSpeed);
 		} else {
-			lookState = LOOKSTATE.RETURN2IDLE;
 			currentTriggerRot = transform.rotation;
 		}
 	}

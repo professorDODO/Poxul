@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class EnemyBrain : MonoBehaviour {
 	[HideInInspector] public enum TASKSTATE {
 		NONE,
-		LOOKING4TRIGGER,
+		APROACH4TRIGGER,
 		SEARCH};
 	// sorted in proirity order
 	[HideInInspector] public TASKSTATE taskState;
@@ -49,9 +49,7 @@ public class EnemyBrain : MonoBehaviour {
 
 	void Update() {
 		alertnessDecay();
-		if (alertState >= ALERTSTATE.ALERTNESS1) {
-			handleHighAlertReaction();
-		}
+		handleHighAlertReaction();
 		Global.debugGUI("alertness", alertness);
 	}
 
@@ -86,17 +84,18 @@ public class EnemyBrain : MonoBehaviour {
 
 	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
+		// when "else if (alertState == ALERTSTATE.ALERTNESS2)" is initiated, this >= must be switched to ==
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
-			taskState = TASKSTATE.LOOKING4TRIGGER;
-			/*
-			THERE SHOULD BE A CLEANER VERSION
-			lookatsensetrigger() should return true if the player is visible at the last angle
-			false if there is something blocking it, so moving will be initiated
-			*/
 			if (noticedPlayerIndex != -1) {
 				Head.GetComponent<EnemyLooking>().setTriggerRotation(
 					Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex].position);
+				if (senseState == SENSESTATE.SEEING) {
+					taskState = TASKSTATE.APROACH4TRIGGER;
+				} else {
+					taskState = TASKSTATE.SEARCH;
+				}
 			}
+
 		} //else if (alertState == ALERTSTATE.ALERTNESS2) {
 			// FIGHT!
 			//SceneManager.LoadScene("fightInitiation");

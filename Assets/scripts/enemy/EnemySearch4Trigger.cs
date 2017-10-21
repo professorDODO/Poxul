@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySearch4Trigger : MonoBehaviour {
-
-
-	void Awake() {
-		
-	}
+	[HideInInspector] public Transform Trigger;
 
 	void Update() {
-		if (GetComponent<EnemyBrain>().taskState == EnemyBrain.TASKSTATE.LOOKING4TRIGGER) {
-			
+		switch (GetComponent<EnemyBrain>().taskState) {
+			case EnemyBrain.TASKSTATE.APROACH4TRIGGER:
+				break;
+			case EnemyBrain.TASKSTATE.SEARCH:
+				break;
 		}
 	}
 }
