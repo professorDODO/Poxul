@@ -29,7 +29,7 @@ public class VisibilityPoint : MonoBehaviour {
 			RaycastHit hit;
 			if (Physics.Raycast(transform.position, LghtSrc[i].position - transform.position,
 			                    out hit, (LghtSrc[i].position - transform.position).magnitude)) {
-				if (hit.transform.gameObject.layer != LayerMask.NameToLayer("Environment")) {
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("LightSource")) {
 					localIntensity += LghtSrc[i].GetComponent<Light>().intensity
 						* Mathf.Pow(LghtSrc[i].GetComponent<Light>().range
 						                          / (LghtSrc[i].position - transform.position).magnitude, 2);

@@ -24,6 +24,9 @@ public class PathFinding : MonoBehaviour {
 	}
 
 	void Update() {
+		if((navAgent.destination - transform.position).magnitude == 0) {
+			navState = NAVSTATE.NONE;
+		}
 		if (navState == NAVSTATE.NAVIGATE) {
 			executeNavigation();
 		}
@@ -51,6 +54,12 @@ public class PathFinding : MonoBehaviour {
 	public void navigateTo(Vector3 destination) {
 		navState = NAVSTATE.NAVIGATE;
 		navAgent.destination = destination;
+	}
+
+	public Vector3 findNearestNavMeshPos(Vector3 nonNavPos) {
+		NavMeshHit hit;
+		NavMesh.SamplePosition(nonNavPos, out hit, float.PositiveInfinity, NavMesh.AllAreas);
+		return hit.position;
 	}
 }
 

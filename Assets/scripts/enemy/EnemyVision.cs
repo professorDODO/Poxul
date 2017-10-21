@@ -5,21 +5,21 @@ using UnityEngine;
 public class EnemyVision : MonoBehaviour {
 	public float fovHor = 70;
 	public float fovVer	= 50;
+	public float distanceAcc = 0.2f;
 	public float intensityThreshhold = 15f;
 	public float regard = 150f; //factor of alertness-increase when this sense is trigered
 	private Transform Self;
 	private Transform[] PlayerArr;
-	public bool[] noticedPlayer {get; private set;}
 
 	void Awake() {
 		Self = transform.parent.parent;
 		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
-		noticedPlayer = new bool[PlayerArr.Length];
 	}
 
 	void Update() {
 		// checking the noticed intensity for each Player
 		float[] sensedIntensity = new float[PlayerArr.Length];
+		bool[]noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			sensedIntensity[i] = noticedIntesity(PlayerArr[i]);
 			if(sensedIntensity[i] >= intensityThreshhold) {
@@ -32,12 +32,6 @@ public class EnemyVision : MonoBehaviour {
 		}
 		if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
 			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
-		}
-	}
-
-	void LateUpdate() {
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			noticedPlayer[i] = false;
 		}
 	}
 
@@ -56,9 +50,11 @@ public class EnemyVision : MonoBehaviour {
 				RaycastHit hit;
 				if (Physics.Raycast(transform.position, visiblePoints[i].position - transform.position, out hit)) {
 					if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-						// 1/distance^2 as an weight
-						sensedIntensity += visiblePoints[i].GetComponent<VisibilityPoint>().localIntensity
-										   / Mathf.Pow((visiblePoints[i].position - transform.position).magnitude, 2);;
+						if((visiblePoints[i].position - transform.position).magnitude >= distanceAcc) {
+							// 1/distance^2 as an weight
+							sensedIntensity += visiblePoints[i].GetComponent<VisibilityPoint>().localIntensity
+										   	   / Mathf.Pow((visiblePoints[i].position - transform.position).magnitude, 2);
+						}
 					}
 				}
 			}

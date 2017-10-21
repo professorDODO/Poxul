@@ -5,7 +5,6 @@ using UnityEngine;
 public class Visibility : MonoBehaviour {
 	public Transform LightSource;
 	private Transform[] VPnt;
-	public float minIntensity = 15f;
 	public float coliderRadius = 0.01f;
 
 

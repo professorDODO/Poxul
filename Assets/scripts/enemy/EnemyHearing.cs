@@ -5,12 +5,12 @@ using UnityEngine;
 public class EnemyHearing : MonoBehaviour {
 	//public Transform Player;
 	public float soundVolumeRecognition = 0.04f;
+	public float distanceAcc = 0.2f;
 	public float regard = 50f; //factor of alertness-increase when this sense is trigered
 	public bool weightRegardByPlayerNumber = true;
 	private Transform Self;
 	private Transform[] PlayerArr;
 	private AudioSource[] audioPlayer;
-	public bool[] noticedPlayer {get; private set;}
 
 	void Awake() {
 		Self = transform.parent.parent;
@@ -22,10 +22,10 @@ public class EnemyHearing : MonoBehaviour {
 		for (int i = 0; i < audioPlayer.Length; i++) {
 			audioPlayer[i] = PlayerArr[i].GetComponent<AudioSource>(); 
 		}
-		noticedPlayer = new bool[PlayerArr.Length];
 	}
 
 	void Update() {
+		bool[] noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i], audioPlayer[i]) >= soundVolumeRecognition) {
 				if (EnemyBrain.SENSESTATE.HEARING >= Self.GetComponent<EnemyBrain>().senseState) {
@@ -40,15 +40,13 @@ public class EnemyHearing : MonoBehaviour {
 			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
 		}
 	}
-		
-	void LateUpdate() {
-		for (int i = 0; i < noticedPlayer.Length; i++) {
-			noticedPlayer[i] = false;
-		}
-	}
 
 	// returns the heard volume depending on the distance
 	float listeningVolume(Transform Player, AudioSource audioPlayer) {
-		return 1 / (Player.position - transform.position).magnitude * audioPlayer.volume;
+		float vol = 0f;
+		if ((Player.position - transform.position).magnitude >= distanceAcc) {
+			vol = 1 / (Player.position - transform.position).magnitude * audioPlayer.volume;
+		}
+		return vol;
 	}
 }

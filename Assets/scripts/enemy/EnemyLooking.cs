@@ -6,7 +6,6 @@ public class EnemyLooking : MonoBehaviour {
 	[HideInInspector] public enum LOOKSTATE {
 		NONE,
 		IDLE,
-		RETURN2IDLE,
 		SEARCH,
 		TRIGGERED};
 	// sorted in proirity order
@@ -16,6 +15,8 @@ public class EnemyLooking : MonoBehaviour {
 	public float lookDirAcc = 1f; // comparison value in degree, when the enemy looks in the direction of last trigger
 	public float idleLookAngle = 75f;
 	public float idleLookSpeedFac = 5f;
+	public float searchLookAngle = 75f;
+	public float searchLookSpeedFac = 5f;
 	private Quaternion aimedRotation;
 	private Quaternion currentTriggerRot;
 	private bool lr;
@@ -23,23 +24,22 @@ public class EnemyLooking : MonoBehaviour {
 	void Awake() {
 		lookState = LOOKSTATE.IDLE;
 		Self = transform.parent;
-		lr = false;
-		aimedRotation = Quaternion.Euler(0, -idleLookAngle, 0);
+		lr = true;
+		aimedRotation = Quaternion.Euler(0, idleLookAngle, 0);
 		currentTriggerRot = transform.rotation;
 	}
 
 	void Update() {
 		handleLooking();
-		Global.debugGUI("LOOKSTATE E" + Self.GetComponent<EnemyBrain>().enemyIndex.ToString(), lookState);
 	}
 
 	void handleLooking() {
 		switch (lookState) {
 			case LOOKSTATE.IDLE:
-				idleLooking();
+				lrLooking(idleLookAngle, idleLookSpeedFac);
 				break;
-			case LOOKSTATE.RETURN2IDLE:
-				return2Idle();
+			case LOOKSTATE.SEARCH:
+				lrLooking(searchLookAngle, searchLookSpeedFac);
 				break;
 			case LOOKSTATE.TRIGGERED:
 				LookAtSenseTrigger();
@@ -47,7 +47,7 @@ public class EnemyLooking : MonoBehaviour {
 		}
 	}
 
-	void return2Idle(){
+	public void return2Idle(){
 		if (Quaternion.Angle(Self.rotation, transform.rotation) > lookDirAcc) {
 			transform.rotation = Quaternion.Slerp(transform.rotation, Self.rotation, lookSpeed * Time.deltaTime);
 		} else {
@@ -55,17 +55,17 @@ public class EnemyLooking : MonoBehaviour {
 		}
 	}
 
-	void idleLooking() {
+	private void lrLooking(float angle, float fac) {
 		if (Quaternion.Angle(aimedRotation, transform.localRotation) < lookDirAcc) {
 			if (lr) {
-				aimedRotation = Quaternion.Inverse(Quaternion.Euler(0, idleLookAngle, 0));
+				aimedRotation = Quaternion.Inverse(Quaternion.Euler(0, angle, 0));
 			} else {
-				aimedRotation = Quaternion.Euler(0, idleLookAngle, 0);
+				aimedRotation = Quaternion.Euler(0, angle, 0);
 			}
 			lr = !lr;
 		}
 		transform.localRotation = Quaternion.Slerp(transform.localRotation, aimedRotation,
-		                                      	   lookSpeed * idleLookSpeedFac * Time.deltaTime
+		                                      	   lookSpeed * fac * Time.deltaTime
 		            							   / (Quaternion.Angle(transform.localRotation, aimedRotation)));
 	}
 

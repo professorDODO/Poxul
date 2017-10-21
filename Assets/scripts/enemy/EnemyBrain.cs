@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class EnemyBrain : MonoBehaviour {
 	[HideInInspector] public enum TASKSTATE {
 		NONE,
-		APROACH4TRIGGER,
+		APROACHTRIGGER,
 		SEARCH};
 	// sorted in proirity order
 	[HideInInspector] public TASKSTATE taskState;
@@ -50,7 +50,7 @@ public class EnemyBrain : MonoBehaviour {
 	void Update() {
 		alertnessDecay();
 		handleHighAlertReaction();
-		Global.debugGUI("alertness", alertness);
+		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), alertState);
 	}
 
 	void LateUpdate() {
@@ -84,22 +84,18 @@ public class EnemyBrain : MonoBehaviour {
 
 	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
-		// when "else if (alertState == ALERTSTATE.ALERTNESS2)" is initiated, this >= must be switched to ==
-		if (alertState >= ALERTSTATE.ALERTNESS1) {
+		if (alertState == ALERTSTATE.ALERTNESS1) {
 			if (noticedPlayerIndex != -1) {
-				Head.GetComponent<EnemyLooking>().setTriggerRotation(
-					Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex].position);
-				if (senseState == SENSESTATE.SEEING) {
-					taskState = TASKSTATE.APROACH4TRIGGER;
-				} else {
-					taskState = TASKSTATE.SEARCH;
-				}
+				Transform Trigger = Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex];
+				GetComponent<EnemyHandleTrigger>().triggerPos = Trigger.position;
+				Head.GetComponent<EnemyLooking>().setTriggerRotation(Trigger.position);
+					GetComponent<EnemyBrain>().taskState = TASKSTATE.APROACHTRIGGER;
 			}
 
-		} //else if (alertState == ALERTSTATE.ALERTNESS2) {
+		} else if (alertState == ALERTSTATE.ALERTNESS2) {
 			// FIGHT!
-			//SceneManager.LoadScene("fightInitiation");
-		//}
+			SceneManager.LoadScene("fightInitiation");
+		}
 	}
 
 	public void sensedPlayerIndex(Transform[] PlayerArr, bool[] noticedPlayer) {
@@ -111,12 +107,10 @@ public class EnemyBrain : MonoBehaviour {
 		}
 		if (!allFalse) {
 			noticedPlayerIndex = nearestTrigger(PlayerArr, noticedPlayer);
-		} else {
-			
 		}
 	}
 
-	private int nearestTrigger(Transform[] PlayerArr, bool[] noticedPlayer) {
+	int nearestTrigger(Transform[] PlayerArr, bool[] noticedPlayer) {
 		float minDist = float.PositiveInfinity;
 		int temp = -1;
 		for (int i = 0; i < PlayerArr.Length; i++) {
