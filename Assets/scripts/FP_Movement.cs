@@ -3,38 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using XboxCtrlrInput;
 
-
 public class FP_Movement : MonoBehaviour {
 
 	private Rigidbody rb;
-	public float playerIndex = 1;
-	public float groundDrag;
+	public float groundDrag = 0.5f;
 	public float moveForce = 50;
 	public float maxSpeed = 10;
-	
-	void Awake() { rb = GetComponent<Rigidbody>(); }
+	private int playerIndex = 1;
+	private float lsX;
+	private float lsY;
 
 
-	void Update() {
-		Vector3 forwardDir = new Vector3 (0,0,1);
-		Vector3 rightDir = new Vector3 (1,0,0);
-		float lsX = XCI.GetAxis (XboxAxis.RightStickX, (XboxController)playerIndex);
-		float lsY = XCI.GetAxis (XboxAxis.RightStickY, (XboxController)playerIndex);
+	void Awake() {
+		rb = GetComponent<Rigidbody>();
+		playerIndex = transform.GetComponent<CharStats>().playerNumber;
+	}
 
-		if (XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex) == 0 && XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex) == 0) {
-			rb.velocity = new Vector3 (rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
-		} else {
-			rb.AddForce (rightDir * lsX * moveForce / groundDrag);
-			rb.AddForce (forwardDir * lsY * moveForce / groundDrag);
-		}
+	void Update(){
+		lsX = XCI.GetAxis(XboxAxis.LeftStickX, (XboxController)playerIndex);
+		lsY = XCI.GetAxis(XboxAxis.LeftStickY, (XboxController)playerIndex);
+
+	}
+
+	// FixedUpdate because physics --> avoid frame-precise actions
+	void FixedUpdate() {
+		// enables movement relative to the camera angle
+		Vector3 forwardDir = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
+		Vector3 rightDir = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
+
+		rb.AddForce(rightDir * lsX * moveForce / groundDrag);
+		rb.AddForce(forwardDir * lsY * moveForce / groundDrag);
+			
+		// reduces the speed to maxSpeed if it goes above
 		if (rb.velocity.magnitude > maxSpeed) {
 			//future: addForce
 			float yVel = rb.velocity.y;
 			rb.velocity = rb.velocity.normalized * maxSpeed;
-			rb.velocity = new Vector3 (rb.velocity.x, yVel,rb.velocity.z);
+			rb.velocity = new Vector3(rb.velocity.x, yVel, rb.velocity.z);
 		}
+		// player looks in movement direction
 		if (lsX != 0 && lsY != 0) {
-			transform.rotation = Quaternion.LookRotation (rightDir * lsX + forwardDir * lsY);
+			transform.rotation = Quaternion.LookRotation(rightDir * lsX + forwardDir * lsY);
 		}
 	}
 }
+
+
+//!! stickMagnitude should generate a constant velocity
