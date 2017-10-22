@@ -25,7 +25,7 @@ public class Trajectory : MonoBehaviour {
 		path.enabled = true;
 		Vector3 position = transform.position;
 		Vector3 velo = startVelo;
-		for(int iii = 0; iii <= numPoints; iii++){
+		for(int iii = 0; iii < numPoints; iii++){
 			path.SetPosition (iii, position);
 			velo += Physics.gravity * Time.fixedDeltaTime;
 			position += velo * Time.fixedDeltaTime;

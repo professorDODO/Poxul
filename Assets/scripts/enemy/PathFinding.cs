@@ -9,14 +9,14 @@ public class PathFinding : MonoBehaviour {
 		NAVIGATE,
 		REACHEDGOAL};
 	[HideInInspector] public NAVSTATE navState;
-	private MovementToMerge Movement;
+	private Movement Movement;
 	private NavMeshAgent navAgent;
 	public float breakRadius = 2f;
 	public float navAccRadius = 0.5f;
 
 
 	void Awake() {
-		Movement = GetComponent<MovementToMerge>();
+		Movement = GetComponent<Movement>();
 		navAgent = GetComponent<NavMeshAgent>();
 		navAgent.updatePosition = false;
 		navAgent.updateRotation = false;
