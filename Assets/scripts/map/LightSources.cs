@@ -9,7 +9,7 @@ public class LightSources : MonoBehaviour {
 
 	void Awake() {
 		// keeps track of all active visibilityPoints
-		LghtSrc = new Transform[Global.childCount(transform)];
+		LghtSrc = new Transform[Global.activeChildCount(transform)];
 		int j = 0;
 		for (int i = 0; i < LghtSrc.Length; i++) {
 			if (transform.GetChild(i).gameObject.activeSelf) {

@@ -10,7 +10,7 @@ public class Visibility : MonoBehaviour {
 
 	void Awake() {
 		// keeps track of all active visibilityPoints
-		VPnt = new Transform[Global.childCount(transform)];
+		VPnt = new Transform[Global.activeChildCount(transform)];
 		int j = 0; // TODO: IMPLEMENT THIS COUNTING METHOD EVERYWHERE ELSE TO IGNORE INACTIVE GO
 		for (int i = 0; i < VPnt.Length; i++) {
 			if (transform.GetChild(i).gameObject.activeSelf) {

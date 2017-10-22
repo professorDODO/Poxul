@@ -8,7 +8,7 @@ public class VisibilityPoint : MonoBehaviour {
 	public float localIntensity { get; private set; }
 
 	void Start () {
-		LghtSrc = new Transform[Global.childCount(transform.parent.GetComponent<Visibility>().LightSource)];
+		LghtSrc = new Transform[Global.activeChildCount(transform.parent.GetComponent<Visibility>().LightSource)];
 		int j = 0;
 		for (int i = 0; i < transform.parent.GetComponent<Visibility>().LightSource.childCount; i++) {
 			if (transform.parent.GetComponent<Visibility>().LightSource.GetChild(i).gameObject.activeSelf) {

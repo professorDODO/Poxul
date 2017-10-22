@@ -84,17 +84,17 @@ public class EnemyBrain : MonoBehaviour {
 
 	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
-		if (alertState == ALERTSTATE.ALERTNESS1) {
+		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			if (noticedPlayerIndex != -1) {
 				Transform Trigger = Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex];
 				GetComponent<EnemyHandleTrigger>().triggerPos = Trigger.position;
-				Head.GetComponent<EnemyLooking>().setTriggerRotation(Trigger.position);
+				Head.GetComponent<EnemyLooking>().LookAt(Trigger.position, EnemyLooking.LOOKSTATE.TRIGGERED);
 					GetComponent<EnemyBrain>().taskState = TASKSTATE.APROACHTRIGGER;
 			}
 
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
 			// FIGHT!
-			SceneManager.LoadScene("fightInitiation");
+			//SceneManager.LoadScene("fightInitiation");
 		}
 	}
 

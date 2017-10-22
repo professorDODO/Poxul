@@ -6,7 +6,9 @@ public class EnemyLooking : MonoBehaviour {
 	[HideInInspector] public enum LOOKSTATE {
 		NONE,
 		IDLE,
+		RETURN2IDLE,
 		SEARCH,
+		LOOKAT,
 		TRIGGERED};
 	// sorted in proirity order
 	[HideInInspector] public LOOKSTATE lookState;
@@ -38,16 +40,24 @@ public class EnemyLooking : MonoBehaviour {
 			case LOOKSTATE.IDLE:
 				lrLooking(idleLookAngle, idleLookSpeedFac);
 				break;
+			case LOOKSTATE.RETURN2IDLE:
+				return2Idle();
+				break;
 			case LOOKSTATE.SEARCH:
 				lrLooking(searchLookAngle, searchLookSpeedFac);
 				break;
+			case LOOKSTATE.LOOKAT:
+				executeLookAt();
+				break;
 			case LOOKSTATE.TRIGGERED:
-				LookAtSenseTrigger();
+				executeLookAt();
 				break;
 		}
 	}
 
-	public void return2Idle(){
+	void return2Idle(){
+		lr = true;
+		aimedRotation = Quaternion.Euler(0, idleLookAngle, 0);
 		if (Quaternion.Angle(Self.rotation, transform.rotation) > lookDirAcc) {
 			transform.rotation = Quaternion.Slerp(transform.rotation, Self.rotation, lookSpeed * Time.deltaTime);
 		} else {
@@ -55,7 +65,7 @@ public class EnemyLooking : MonoBehaviour {
 		}
 	}
 
-	private void lrLooking(float angle, float fac) {
+	void lrLooking(float angle, float fac) {
 		if (Quaternion.Angle(aimedRotation, transform.localRotation) < lookDirAcc) {
 			if (lr) {
 				aimedRotation = Quaternion.Inverse(Quaternion.Euler(0, angle, 0));
@@ -69,8 +79,7 @@ public class EnemyLooking : MonoBehaviour {
 		            							   / (Quaternion.Angle(transform.localRotation, aimedRotation)));
 	}
 
-	// look at the postion of the nearist trigger of the the sense with highest priority
-	private void LookAtSenseTrigger() {
+	void executeLookAt() {
 		if (Quaternion.Angle(currentTriggerRot, transform.rotation) > lookDirAcc) {
 			transform.rotation = Quaternion.Slerp(transform.rotation, currentTriggerRot, Time.deltaTime * lookSpeed);
 		} else {
@@ -78,8 +87,13 @@ public class EnemyLooking : MonoBehaviour {
 		}
 	}
 
-	public void setTriggerRotation(Vector3 triggerPos) {
-		lookState = LOOKSTATE.TRIGGERED;
-		currentTriggerRot = Quaternion.LookRotation(triggerPos - transform.position);
+	// initiate the action to look at a certain position and setting the corresponding lookState
+	public void LookAt(Vector3 pos, LOOKSTATE lookStateIn) {
+		if (lookStateIn != LOOKSTATE.LOOKAT && lookStateIn != LOOKSTATE.TRIGGERED) {
+			lookState = lookStateIn;
+			currentTriggerRot = Quaternion.LookRotation(pos - transform.position);
+		} else {
+			Debug.Log("There was an attempt to set an invalid lookState");
+		}
 	}
 }

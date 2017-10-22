@@ -7,7 +7,7 @@ public class PlayerLocation : MonoBehaviour {
 
 	void Awake() {
 		// keeps track of all active players
-		PlayerArr = new Transform[Global.childCount(transform)];
+		PlayerArr = new Transform[Global.activeChildCount(transform)];
 		int j = 0;
 		for (int i = 0; i < transform.childCount; i++) {
 			if (transform.GetChild(i).gameObject.activeSelf) {

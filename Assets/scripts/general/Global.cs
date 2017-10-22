@@ -5,7 +5,7 @@ using UnityEngine;
 public class Global : MonoBehaviour {
 
 	// counts active childs
-	public static int childCount(Transform GO) {
+	public static int activeChildCount(Transform GO) {
 		int childCount = 0;
 		for (int i = 0; i < GO.childCount; i++) {
 			if (GO.GetChild(i).gameObject.activeSelf) {

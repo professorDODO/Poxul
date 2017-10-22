@@ -39,7 +39,7 @@ public class EnemyVision : MonoBehaviour {
 	// for the enemy visible, visibilityPoints of a Player
 	float noticedIntesity(Transform Player) {
 		float sensedIntensity = 0f;
-		Transform[] visiblePoints = new Transform[Global.childCount(Player.Find("visiblePoints"))];
+		Transform[] visiblePoints = new Transform[Global.activeChildCount(Player.Find("visiblePoints"))];
 		for (int i = 0; i < visiblePoints.Length; i++) {
 			if (Player.Find("visiblePoints").GetChild(i).gameObject.activeSelf) {
 				visiblePoints[i] = Player.Find("visiblePoints").GetChild(i);
