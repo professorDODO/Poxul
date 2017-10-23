@@ -28,6 +28,6 @@ public class MovementSound : MonoBehaviour {
 		}
 		// percentage of Speed influences the sound volume
 		audio.volume = Mathf.Pow(new Vector3(rb.velocity.x, 0, rb.velocity.z).magnitude
-		                         / GetComponent<MovementToMerge>().maxSpeed, soundPow);
+		                         / GetComponent<Movement>().maxSpeed, soundPow);
 	}
 }
