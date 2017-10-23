@@ -34,6 +34,5 @@ public class EnemyHearing : MonoBehaviour {
 	// returns the heard volume depending on the distance
 	float listeningVolume(Transform Player) {
 		return Player.GetComponent<AudioSource>().volume * 1 / (Player.position - transform.position).magnitude;
-		 
 	}
 }

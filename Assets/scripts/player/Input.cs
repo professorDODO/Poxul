@@ -20,13 +20,14 @@ public class Input : MonoBehaviour {
 		if (XCI.GetButtonUp (XboxButton.LeftStick, (XboxController)playerIndex)) {
 			Movement.initiateSneak ();
 		}
-		if (XCI.GetButton (XboxButton.A, (XboxController)playerIndex)) {
+		if (XCI.GetButton (XboxButton.A, (XboxController)playerIndex)
+		    && Movement.jumpStates != Movement.JUMPSTATES.JUMPING) {
 			Movement.jumpStates = Movement.JUMPSTATES.JUMPPREP;
 			Movement.jumpPreparation ();
 		}
+		// this must be in fixedUpdate
 		if (XCI.GetButtonUp (XboxButton.A, (XboxController)playerIndex)) {
-			Movement.jumpStates = Movement.JUMPSTATES.JUMPING;
-			Movement.jump();
+			Movement.jumpStates = Movement.JUMPSTATES.LAUNCH;
 		}
 	}
 
@@ -34,6 +35,9 @@ public class Input : MonoBehaviour {
 		if (Movement.jumpStates != Movement.JUMPSTATES.JUMPING) {
 			Movement.move (inputVec, true);
 			Movement.rotate (inputVec, true);
+		}
+		if (Movement.jumpStates == Movement.JUMPSTATES.LAUNCH) {
+			Movement.jump();
 		}
 		Movement.movementDebug();
 	}

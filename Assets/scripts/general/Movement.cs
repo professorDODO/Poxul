@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour {
 	public float groundDrag = 0.9f;
 	public float moveForce = 50;
 	public float maxSpeed = 10;
+	public float zeroSpeedAcc = 0.01f;
 	public float sneakSpeedFac = 0.5f;
 	public float rotationSpeed = 10f;
 
@@ -27,6 +28,7 @@ public class Movement : MonoBehaviour {
 	[HideInInspector] public enum JUMPSTATES{
 		GROUNDED,
 		JUMPPREP,
+		LAUNCH,
 		JUMPING
 	};
 
@@ -44,11 +46,11 @@ public class Movement : MonoBehaviour {
 			forwardDir = new Vector3 (Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
 			rightDir = new Vector3 (Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 		}
-		if (inputVec.magnitude == 0) {
+		if (inputVec.magnitude <= zeroSpeedAcc) {
 			rb.velocity = new Vector3 (rb.velocity.x * groundDrag, rb.velocity.y, rb.velocity.z * groundDrag);
 		} else {
 			rb.AddForce ((rightDir * inputVec.x + forwardDir * inputVec.y).normalized * moveForce / groundDrag);
-			rb.AddForce (-rb.velocity / ssFac / inputVec.magnitude / maxSpeed * 42);
+			rb.AddForce (-rb.velocity / ssFac / inputVec.magnitude / maxSpeed * 42f);
 		}
 		Global.debugGUI ("Velo", rb.velocity.magnitude);
 	}
@@ -91,6 +93,7 @@ public class Movement : MonoBehaviour {
 		trajec.GetComponent<Trajectory>().RenderTrajectory (new Vector3(rb.velocity.x, jumpBuildUp * Time.fixedDeltaTime / rb.mass, rb.velocity.z));
 		rb.AddForce (new Vector3 (0, jumpBuildUp, 0));
 		jumpBuildUp = jumpForce / 10;
+		jumpStates = JUMPSTATES.JUMPING;
 	}
 
 	public void movementDebug() {
