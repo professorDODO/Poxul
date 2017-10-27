@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,11 +14,22 @@ public class EnemyVision : MonoBehaviour {
 
 	void Awake() {
 		Self = transform.parent.parent;
-		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		if (Self.GetComponent<EnemyBrain>().Player == null || Self.GetComponent<EnemyBrain>().Player.Equals(null)) {
+			Self.GetComponent<EnemyBrain>().nonPlayerMode = true;
+
+		} else {
+			PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		}
 	}
 
 	void Update() {
-		// checking the noticed intensity for each Player
+		if (!Self.GetComponent<EnemyBrain>().nonPlayerMode) {
+			playerSenseTrigger();
+		}
+	}
+
+	// checking the noticed intensity for each Player
+	void playerSenseTrigger() {
 		float[] sensedIntensity = new float[PlayerArr.Length];
 		bool[]noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
