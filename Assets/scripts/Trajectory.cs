@@ -5,8 +5,8 @@ using UnityEngine;
 public class Trajectory : MonoBehaviour {
 
 	public GameObject trajPoint;
-	[SerializeField]
-	int numPoints;
+	[SerializeField] int numPoints = 5;
+	[SerializeField] int delay = 15;
 	LineRenderer path;
 
 	// Use this for initialization
@@ -15,11 +15,6 @@ public class Trajectory : MonoBehaviour {
 		path.SetVertexCount (numPoints);
 		path.enabled = false;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	public void RenderTrajectory(Vector3 startVelo){
 		path.enabled = true;
@@ -27,8 +22,8 @@ public class Trajectory : MonoBehaviour {
 		Vector3 velo = startVelo;
 		for(int iii = 0; iii < numPoints; iii++){
 			path.SetPosition (iii, position);
-			velo += Physics.gravity * Time.fixedDeltaTime;
-			position += velo * Time.fixedDeltaTime;
+			velo += Physics.gravity * Time.fixedDeltaTime / delay;
+			position += velo * Time.fixedDeltaTime / delay;
 		}
 	}
 }
