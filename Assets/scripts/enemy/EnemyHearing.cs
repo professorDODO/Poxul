@@ -18,11 +18,11 @@ public class EnemyHearing : MonoBehaviour {
 
 	void Update() {
 		if (!Self.GetComponent<EnemyBrain>().nonPlayerMode) {
-			playerSenseTrigger();
+			playerHearingTrigger();
 		}
 	}
 
-	void playerSenseTrigger() {
+	void playerHearingTrigger() {
 		bool[] noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i]) >= recognizedVolumeThreshhold) {
