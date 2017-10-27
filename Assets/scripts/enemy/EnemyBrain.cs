@@ -39,8 +39,15 @@ public class EnemyBrain : MonoBehaviour {
 	public float baseAlertnessDecay = 0.1f; // in % of alertnessStep per deltaTime
 	private float alertness = 0f;
 	private int noticedPlayerIndex = -1;
+	[HideInInspector] public bool nonPlayerMode = false;
 
 	void Awake() {
+		if (nonPlayerMode) {
+			Debug.Log("Enemy E" + enemyIndex.ToString() + " has no Player object; continuing in non-Player-mode");
+			Debug.Log("Setting alertness to ALERTNESS1");
+			alertnessMin = alertnessStep * (int)ALERTSTATE.ALERTNESS1;
+			alertState = ALERTSTATE.ALERTNESS1;
+		}
 		alertnessMax = alertnessStep * (int)ALERTSTATE.ALERTNESS2;
 		senseState = SENSESTATE.NONE;
 		alertState = ALERTSTATE.NONE;

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,11 +14,23 @@ public class EnemyVision : MonoBehaviour {
 
 	void Awake() {
 		Self = transform.parent.parent;
-		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		if (Self.GetComponent<EnemyBrain>().Player == null || Self.GetComponent<EnemyBrain>().Player.Equals(null)) {
+			Self.GetComponent<EnemyBrain>().nonPlayerMode = true;
+
+		} else {
+			PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		}
 	}
 
 	void Update() {
-		// checking the noticed intensity for each Player
+		if (!Self.GetComponent<EnemyBrain>().nonPlayerMode) {
+			playerVisionTrigger();
+		}
+	}
+
+	// checking the noticed intensity for each Player and creating a sense reaction
+	// in case of noticedIntensity >= threshhold
+	void playerVisionTrigger() {
 		float[] sensedIntensity = new float[PlayerArr.Length];
 		bool[]noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
@@ -32,6 +45,26 @@ public class EnemyVision : MonoBehaviour {
 		}
 		if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
 			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
+		}
+	}
+
+	public void nonPlayerVisionTrigger(Vector3 pos, float intensity) {
+		float sensedIntensity = 0f;
+		float vertical = Global.angleInPlane(transform, pos, transform.right);
+		float horizontal = Global.angleInPlane(transform, pos, transform.up);
+		if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
+			RaycastHit hit;
+			if (Physics.Raycast(transform.position, pos - transform.position, out hit)) {
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
+					if((pos - transform.position).magnitude >= distanceAcc) {
+						// 1/distance^2 as an weight
+						sensedIntensity = intensity / Mathf.Pow((pos - transform.position).magnitude, 2);
+					}
+				}
+			}
+		}
+		if (sensedIntensity >= intensityThreshhold) {
+			Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity / intensityThreshhold * regard);
 		}
 	}
 

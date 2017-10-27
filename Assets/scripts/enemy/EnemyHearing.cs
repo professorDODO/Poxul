@@ -11,10 +11,18 @@ public class EnemyHearing : MonoBehaviour {
 
 	void Awake() {
 		Self = transform.parent.parent;
-		PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		if (!Self.GetComponent<EnemyBrain>().nonPlayerMode) {
+			PlayerArr = Self.GetComponent<EnemyBrain>().Player.GetComponent<PlayerLocation>().PlayerArr;
+		}
 	}
 
 	void Update() {
+		if (!Self.GetComponent<EnemyBrain>().nonPlayerMode) {
+			playerHearingTrigger();
+		}
+	}
+
+	void playerHearingTrigger() {
 		bool[] noticedPlayer = new bool[PlayerArr.Length];
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			if (listeningVolume(PlayerArr[i]) >= recognizedVolumeThreshhold) {
@@ -23,7 +31,7 @@ public class EnemyHearing : MonoBehaviour {
 					Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.HEARING;
 				}
 				Self.GetComponent<EnemyBrain>().senseTrigger(listeningVolume(PlayerArr[i])
-															 / recognizedVolumeThreshhold * regard);
+				                                             / recognizedVolumeThreshhold * regard);
 			}
 			if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
 				Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);

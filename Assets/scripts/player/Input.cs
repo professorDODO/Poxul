@@ -30,6 +30,9 @@ public class Input : MonoBehaviour {
 		if (XCI.GetButtonUp (XboxButton.A, (XboxController)playerIndex)) {
 			Movement.jumpStates = Movement.JUMPSTATES.LAUNCH;
 		}
+		if (XCI.GetButton(XboxButton.Y, (XboxController)playerIndex)) {
+			GetComponent<Abilities>().triggerEnemies();
+		}
 	}
 
 	void FixedUpdate(){
