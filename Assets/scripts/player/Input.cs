@@ -4,6 +4,7 @@ using UnityEngine;
 using XboxCtrlrInput;
 
 public class Input : MonoBehaviour {
+	
 	private int playerIndex = 1;
 	private Movement Movement;
 	private Vector2 inputVec;
@@ -17,6 +18,7 @@ public class Input : MonoBehaviour {
 	void Update () {
 		inputVec = new Vector2 (XCI.GetAxis (XboxAxis.LeftStickX, (XboxController)playerIndex),
 			XCI.GetAxis (XboxAxis.LeftStickY, (XboxController)playerIndex));
+		
 		if (XCI.GetButtonUp (XboxButton.LeftStick, (XboxController)playerIndex)) {
 			Movement.initiateSneak ();
 		}
@@ -25,7 +27,6 @@ public class Input : MonoBehaviour {
 			Movement.jumpStates = Movement.JUMPSTATES.JUMPPREP;
 			Movement.jumpPreparation ();
 		}
-		// this must be in fixedUpdate
 		if (XCI.GetButtonUp (XboxButton.A, (XboxController)playerIndex)) {
 			Movement.jumpStates = Movement.JUMPSTATES.LAUNCH;
 		}

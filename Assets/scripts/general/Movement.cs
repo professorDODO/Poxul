@@ -4,25 +4,29 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour {
 
-	private Rigidbody rb;
-	public float groundDrag = 0.9f;
-	public float moveForce = 50;
+	// MOVE
+	// parameters
 	public float maxSpeed = 10;
-	public float zeroSpeedAcc = 0.01f;
-	public float sneakSpeedFac = 0.5f;
-	public float rotationSpeed = 10f;
-
+	[SerializeField] float groundDrag = 0.9f;
+	[SerializeField] float moveForce = 50;
+	[SerializeField] float zeroSpeedAcc = 0.1f;
+	[SerializeField] float sneakSpeedFac = 0.5f;
+	[SerializeField] float rotationSpeed = 10f;
+	// variables
+	private Rigidbody rb;
 	private Vector3 forwardDir = Vector3.forward;
 	private Vector3 rightDir = Vector3.right;
 	private bool sneak;
 	private float ssFac;
 
+	// JUMP
+	// parameters
+	[SerializeField] int jumpForce = 250;
+	[SerializeField] float jumpCharge = 0.5f;
+	[SerializeField] float minJump = 0.5f;
+	// variables
+	float jumpBuildUp;
 	public GameObject trajec;
-
-	public int jumpForce = 250;
-	public float jumpCharge = 0.5f;
-	public float jumpBuildUp;
-
 	public JUMPSTATES jumpStates;
 
 	[HideInInspector] public enum JUMPSTATES{
@@ -37,7 +41,7 @@ public class Movement : MonoBehaviour {
 		rb = GetComponent<Rigidbody>();
 		sneak = false;
 		ssFac = 1;
-		jumpBuildUp = jumpForce / 10;
+		jumpBuildUp = jumpForce * minJump;
 	}
 
 	public void move(Vector2 inputVec, bool rel2Cam) {
@@ -52,7 +56,6 @@ public class Movement : MonoBehaviour {
 			rb.AddForce ((rightDir * inputVec.x + forwardDir * inputVec.y).normalized * moveForce / groundDrag);
 			rb.AddForce (-rb.velocity / ssFac / inputVec.magnitude / maxSpeed * 42f);
 		}
-		Global.debugGUI ("Velo", rb.velocity.magnitude);
 	}
 
 	public void rotate(Vector2 inputVec, bool rel2Cam) {
@@ -83,7 +86,6 @@ public class Movement : MonoBehaviour {
 	public void jumpPreparation(){
 		if(jumpBuildUp < jumpForce){
 			jumpBuildUp += jumpForce * jumpCharge * Time.deltaTime;
-			Global.debugGUI ("JBU", jumpBuildUp);
 		}
 		trajec.GetComponent<Trajectory>().RenderTrajectory (new Vector3(rb.velocity.x, jumpBuildUp * Time.fixedDeltaTime / rb.mass, rb.velocity.z));
 		Debug.Log (new Vector2 (rb.velocity.x, rb.velocity.z).magnitude);
@@ -92,7 +94,7 @@ public class Movement : MonoBehaviour {
 	public void jump(){
 		trajec.GetComponent<Trajectory>().RenderTrajectory (new Vector3(rb.velocity.x, jumpBuildUp * Time.fixedDeltaTime / rb.mass, rb.velocity.z));
 		rb.AddForce (new Vector3 (0, jumpBuildUp, 0));
-		jumpBuildUp = jumpForce / 10;
+		jumpBuildUp = jumpForce * minJump;
 		jumpStates = JUMPSTATES.JUMPING;
 	}
 
