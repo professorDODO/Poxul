@@ -93,7 +93,8 @@ public class EnemyLooking : MonoBehaviour {
 			lookState = lookStateIn;
 			currentTriggerRot = Quaternion.LookRotation(pos - transform.position);
 		} else {
-			Debug.Log("There was an attempt to set an invalid lookState");
+			Debug.Log("There was an attempt to set an invalid lookState for E"
+			          + Self.GetComponent<EnemyBrain>().enemyIndex.ToString());
 		}
 	}
 }

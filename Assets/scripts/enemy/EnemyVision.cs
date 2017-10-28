@@ -57,6 +57,9 @@ public class EnemyVision : MonoBehaviour {
 			if (Physics.Raycast(transform.position, pos - transform.position, out hit)) {
 				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
 					if((pos - transform.position).magnitude >= distanceAcc) {
+						if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
+							Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
+						}
 						// 1/distance^2 as an weight
 						sensedIntensity = intensity / Mathf.Pow((pos - transform.position).magnitude, 2);
 					}

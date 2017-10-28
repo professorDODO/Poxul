@@ -11,7 +11,7 @@ public class Abilities : MonoBehaviour {
 		int j = 0;
 		for (int i = 0; i < Enemy.childCount; i++) {
 			if (Enemy.GetChild(i).gameObject.activeSelf) {
-				EnemyArr[i] = Enemy.GetChild(i);
+				EnemyArr[j] = Enemy.GetChild(i);
 				j++;
 			}
 		}
@@ -19,7 +19,12 @@ public class Abilities : MonoBehaviour {
 
 	public void triggerEnemies() {
 		for (int i = 0; i < EnemyArr.Length; i++) {
-			EnemyArr[i].GetComponent<EnemyVision>().nonPlayerVisionTrigger(transform.position, 4);
+			EnemyArr[i].GetComponent<EnemyBrain>().Senses.GetComponent<EnemyVision>()
+				.nonPlayerVisionTrigger(transform.position, 20);
+			if (EnemyArr[i].GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.SEEING) {
+				EnemyArr[i].GetComponent<EnemyBrain>().setMinAlertState(EnemyBrain.ALERTSTATE.ALERTNESS1);
+				EnemyArr[i].GetComponent<EnemyBrain>().handleTrigger(transform.position);
+			}
 		}
 	}
 }
