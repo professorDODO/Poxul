@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FreezePlayer : MonoBehaviour {
+public class FreezePlayer : Freeze {
 
-	public GameObject fmObj;
-	FightManager fmScr;
-
-	Rigidbody rb;
+	Input inScr;
 
 	Vector3 lastVelo;
 	Vector3 lastAngVelo;
@@ -16,18 +13,17 @@ public class FreezePlayer : MonoBehaviour {
 	void Start () {
 		fmScr = fmObj.GetComponent<FightManager>();
 		fmScr.fPlayer.Add(this);
+		inScr = this.GetComponent<Input>();
 		rb = GetComponent<Rigidbody> ();
 	}
 	
-	public void Freeze(){
-		lastVelo = rb.velocity;
-		lastAngVelo = rb.angularVelocity;
-		rb.isKinematic = true;
+	public void Freezing(){
+		FreezeMove(rb,lastVelo,lastAngVelo);
+		inScr.freeze = true;
 	}
 
-	public void Unfreeze(){
-		rb.isKinematic = false;
-		rb.velocity = lastVelo;
-		rb.angularVelocity = lastAngVelo;
+	public void Unfreezing(){
+		UnfreezeMove(rb,lastVelo,lastAngVelo);
+		inScr.freeze = false;
 	}
 }
