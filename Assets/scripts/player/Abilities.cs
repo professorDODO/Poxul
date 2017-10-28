@@ -24,6 +24,7 @@ public class Abilities : MonoBehaviour {
 			if (EnemyArr[i].GetComponent<EnemyBrain>().senseState == EnemyBrain.SENSESTATE.SEEING) {
 				EnemyArr[i].GetComponent<EnemyBrain>().setMinAlertState(EnemyBrain.ALERTSTATE.ALERTNESS1);
 				EnemyArr[i].GetComponent<EnemyBrain>().handleTrigger(transform.position);
+				EnemyArr[i].GetComponent<EnemyMessaging>().shout(transform.position);
 			}
 		}
 	}

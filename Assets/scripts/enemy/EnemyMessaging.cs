@@ -7,16 +7,14 @@ public class EnemyMessaging : MonoBehaviour {
 	[SerializeField] private float shoutRadius = 100;
 
 	public void shout(Vector3 triggerPos) {
+		if (!GetComponent<AudioSource>().isPlaying) {
+			GetComponent<AudioSource>().Play();
+		}
 		Collider[] nearbyEnemyCol = Physics.OverlapSphere(transform.position, shoutRadius,
 		                                                  1 << LayerMask.NameToLayer("Enemy"));
 		for (int i = 0; i < nearbyEnemyCol.Length; i++) {
-			EnemyMessaging enMsg = nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>();
-			try {
-				if(enMsg) {
-					enMsg.receive(triggerPos);
-				}
-			} catch {
-				throw new ArgumentNullException();
+			if (nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>()) {
+				nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>().receive(triggerPos);
 			}
 		}
 	}

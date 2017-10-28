@@ -76,9 +76,11 @@ public class EnemyBrain : MonoBehaviour {
 	}
 
 	public void setMinAlertState(ALERTSTATE alState) {
-		alertState = alState;
-		alertnessMin = alertnessStep * (int)alState;
-		alertness = alertnessMin;
+		if(alState >= alertState) {
+			alertState = alState;
+			alertnessMin = alertnessStep * (int)alState;
+			alertness = alertnessMin;
+		}
 	}
 
 	// decay of the alertness value over time
@@ -96,7 +98,10 @@ public class EnemyBrain : MonoBehaviour {
 	void handleHighAlertReaction() {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			if (noticedPlayerIndex != -1) {
-				handleTrigger(Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex].position);
+				Vector3 triggerPos = Player.GetComponent<PlayerLocation>()
+										.PlayerArr[noticedPlayerIndex].position;
+				handleTrigger(triggerPos);
+				GetComponent<EnemyMessaging>().shout(triggerPos);
 			}
 
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
@@ -109,7 +114,6 @@ public class EnemyBrain : MonoBehaviour {
 		GetComponent<EnemyBrain>().taskState = TASKSTATE.APROACHTRIGGER;
 		GetComponent<EnemyHandleTrigger>().triggerPos = pos;
 		Head.GetComponent<EnemyLooking>().LookAt(pos, EnemyLooking.LOOKSTATE.TRIGGERED);
-		GetComponent<EnemyMessaging>().shout(pos);
 	}
 
 	public void sensedPlayerIndex(Transform[] PlayerArr, bool[] noticedPlayer) {
