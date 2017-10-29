@@ -84,16 +84,18 @@ public class EnemyLooking : MonoBehaviour {
 			transform.rotation = Quaternion.Slerp(transform.rotation, currentTriggerRot, Time.deltaTime * lookSpeed);
 		} else {
 			currentTriggerRot = transform.rotation;
+			lookState = LOOKSTATE.NONE;
 		}
 	}
 
 	// initiate the action to look at a certain position and setting the corresponding lookState
 	public void LookAt(Vector3 pos, LOOKSTATE lookStateIn) {
-		if (lookStateIn != LOOKSTATE.LOOKAT && lookStateIn != LOOKSTATE.TRIGGERED) {
+		if (lookStateIn == LOOKSTATE.LOOKAT || lookStateIn == LOOKSTATE.TRIGGERED) {
 			lookState = lookStateIn;
 			currentTriggerRot = Quaternion.LookRotation(pos - transform.position);
 		} else {
-			Debug.Log("There was an attempt to set an invalid lookState");
+			Debug.Log("There was an attempt to set an invalid lookState for E"
+			          + Self.GetComponent<EnemyBrain>().enemyIndex.ToString());
 		}
 	}
 }

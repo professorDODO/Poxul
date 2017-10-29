@@ -44,9 +44,6 @@ public class EnemyBrain : MonoBehaviour {
 	void Awake() {
 		if (nonPlayerMode) {
 			Debug.Log("Enemy E" + enemyIndex.ToString() + " has no Player object; continuing in non-Player-mode");
-			Debug.Log("Setting alertness to ALERTNESS1");
-			alertnessMin = alertnessStep * (int)ALERTSTATE.ALERTNESS1;
-			alertState = ALERTSTATE.ALERTNESS1;
 		}
 		alertnessMax = alertnessStep * (int)ALERTSTATE.ALERTNESS2;
 		senseState = SENSESTATE.NONE;
@@ -57,7 +54,7 @@ public class EnemyBrain : MonoBehaviour {
 	void Update() {
 		alertnessDecay();
 		handleHighAlertReaction();
-		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), alertState);
+		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), alertness);
 	}
 
 	void LateUpdate() {
@@ -78,6 +75,14 @@ public class EnemyBrain : MonoBehaviour {
 		}
 	}
 
+	public void setMinAlertState(ALERTSTATE alState) {
+		if(alState >= alertState) {
+			alertState = alState;
+			alertnessMin = alertnessStep * (int)alState;
+			alertness = alertnessMin;
+		}
+	}
+
 	// decay of the alertness value over time
 	void alertnessDecay() {
 		if (alertState != ALERTSTATE.ALERTNESS2) {
@@ -93,16 +98,22 @@ public class EnemyBrain : MonoBehaviour {
 	void handleHighAlertReaction() {
 		if (alertState >= ALERTSTATE.ALERTNESS1) {
 			if (noticedPlayerIndex != -1) {
-				Transform Trigger = Player.GetComponent<PlayerLocation>().PlayerArr[noticedPlayerIndex];
-				GetComponent<EnemyHandleTrigger>().triggerPos = Trigger.position;
-				Head.GetComponent<EnemyLooking>().LookAt(Trigger.position, EnemyLooking.LOOKSTATE.TRIGGERED);
-					GetComponent<EnemyBrain>().taskState = TASKSTATE.APROACHTRIGGER;
+				Vector3 triggerPos = Player.GetComponent<PlayerLocation>()
+										.PlayerArr[noticedPlayerIndex].position;
+				handleTrigger(triggerPos);
+				GetComponent<EnemyMessaging>().shout(triggerPos);
 			}
 
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
 			// FIGHT!
 			//SceneManager.LoadScene("fightInitiation");
 		}
+	}
+
+	public void handleTrigger(Vector3 pos) {
+		GetComponent<EnemyBrain>().taskState = TASKSTATE.APROACHTRIGGER;
+		GetComponent<EnemyHandleTrigger>().triggerPos = pos;
+		Head.GetComponent<EnemyLooking>().LookAt(pos, EnemyLooking.LOOKSTATE.TRIGGERED);
 	}
 
 	public void sensedPlayerIndex(Transform[] PlayerArr, bool[] noticedPlayer) {
