@@ -4,6 +4,32 @@ using UnityEngine;
 
 public class Global : MonoBehaviour {
 
+	//this part will be at the fightManager
+	[HideInInspector] public enum FIGHTSTATE {
+		NONE,
+		FIGHTPREP,
+		FIGHT};
+	// sorted in proirity order
+	[HideInInspector] public static FIGHTSTATE fightState;
+	[HideInInspector] public static List<Transform> FightParticipants = new List<Transform>();
+	public static Transform Player;
+
+	public static void joinFight(Transform Enemy) {
+		Transform[] PlayerArr = Player.GetComponent<PlayerLocation>().PlayerArr;
+		if(fightState == FIGHTSTATE.NONE) {
+			for (int i = 0; i < PlayerArr.Length; i++) {
+				FightParticipants.Add(PlayerArr[i]);
+			}
+			fightState = FIGHTSTATE.FIGHTPREP;
+		}
+		if(fightState == FIGHTSTATE.FIGHTPREP) {
+			if (!FightParticipants.Contains(Enemy)) {
+				FightParticipants.Add(Enemy);
+			}
+		}
+	}
+
+
 	// counts active childs
 	public static int activeChildCount(Transform GO) {
 		int childCount = 0;
