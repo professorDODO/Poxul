@@ -13,7 +13,7 @@ public class EnemyMessaging : MonoBehaviour {
 		Collider[] nearbyEnemyCol = Physics.OverlapSphere(transform.position, shoutRadius,
 		                                                  1 << LayerMask.NameToLayer("Enemy"));
 		for (int i = 0; i < nearbyEnemyCol.Length; i++) {
-			if (nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>()) {
+			if (nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>() && nearbyEnemyCol[i].gameObject != gameObject) {
 				nearbyEnemyCol[i].gameObject.GetComponent<EnemyMessaging>().receive(triggerPos);
 			}
 		}

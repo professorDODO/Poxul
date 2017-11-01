@@ -76,7 +76,7 @@ public class EnemyBrain : MonoBehaviour {
 	}
 
 	public void setMinAlertState(ALERTSTATE alState) {
-		if(alState >= alertState) {
+		if(alState > alertState) {
 			alertState = alState;
 			alertnessMin = alertnessStep * (int)alState;
 			alertness = alertnessMin;
