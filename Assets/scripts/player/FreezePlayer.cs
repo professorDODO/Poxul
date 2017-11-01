@@ -6,8 +6,8 @@ public class FreezePlayer : Freeze {
 
 	Input inScr;
 
-	Vector3 lastVelo;
-	Vector3 lastAngVelo;
+	[HideInInspector] public Vector3 lastVelo;
+	[HideInInspector] public Vector3 lastAngVelo;
 
 	// Use this for initialization
 	void Start () {
@@ -16,14 +16,12 @@ public class FreezePlayer : Freeze {
 		inScr = this.GetComponent<Input>();
 		rb = GetComponent<Rigidbody> ();
 	}
-	
-	public void Freezing(){
-		FreezeMove(rb,lastVelo,lastAngVelo);
+
+	public override void SpecialFreeze(){
 		inScr.freeze = true;
 	}
 
-	public void Unfreezing(){
-		UnfreezeMove(rb,lastVelo,lastAngVelo);
+	public override void SpecialUnfreeze(){
 		inScr.freeze = false;
 	}
 }

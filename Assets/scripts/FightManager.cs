@@ -37,14 +37,16 @@ public class FightManager : MonoBehaviour {
 		if(lastState != FIGHTSTATES.FIGHTPREP && state == FIGHTSTATES.FIGHTPREP){
 			timer = prepTime;
 			foreach(FreezePlayer fp in fPlayer){
-				fp.Freezing();
+				fp.FreezeMove(fp.rb, fp.lastVelo, fp.lastAngVelo);
+				fp.SpecialFreeze();
 			}
 		}else if(lastState != FIGHTSTATES.INPUT && state == FIGHTSTATES.INPUT){
 			timer = inputTime;
 		}else if(lastState != FIGHTSTATES.ACTION && state == FIGHTSTATES.ACTION){
 			timer = actionTime;
 			foreach(FreezePlayer fp in fPlayer){
-				fp.Unfreezing();
+				fp.UnfreezeMove(fp.rb, fp.lastVelo, fp.lastAngVelo);
+				fp.SpecialUnfreeze();
 			}
 		}
 
