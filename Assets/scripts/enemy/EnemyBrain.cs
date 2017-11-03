@@ -32,6 +32,7 @@ public class EnemyBrain : MonoBehaviour {
 	public Transform Player;
 	public Transform Senses;
 	public Transform Head;
+	public FightManager fm;
 	public int enemyIndex;
 	public float alertnessStep = 100f;
 	private float alertnessMin = 0f;
@@ -105,11 +106,11 @@ public class EnemyBrain : MonoBehaviour {
 			}
 
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
-			Global.joinFight(transform);
+			fm.joinFight(transform);
 			//just Debugging
-			if (Global.FightParticipants != null) {
-				for (int i = 0; i < Global.FightParticipants.Count; i++) {
-					Global.debugGUI("FightParticipant #" + i.ToString(), Global.FightParticipants[i]);
+			if (fm.FightParticipants != null) {
+				for (int i = 0; i < fm.FightParticipants.Count; i++) {
+					Global.debugGUI("FightParticipant #" + i.ToString(), fm.FightParticipants[i]);
 				}
 			}
 			// FIGHT!

@@ -6,8 +6,6 @@ public class PlayerLocation : MonoBehaviour {
 	public Transform[] PlayerArr { get; private set; }
 
 	void Awake() {
-		// when the fightManager is initiated, this line becomes irrelevant
-		Global.Player = transform;
 		// keeps track of all active players
 		PlayerArr = new Transform[Global.activeChildCount(transform)];
 		int j = 0;
