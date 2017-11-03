@@ -28,10 +28,11 @@ public class EnemyBrain : MonoBehaviour {
 		ALERTNESS1,
 		ALERTNESS2};
 	// sorted in proirity order
-	[HideInInspector] public ALERTSTATE alertState;
+	public ALERTSTATE alertState { get; private set; }
 	public Transform Player;
 	public Transform Senses;
 	public Transform Head;
+	public FightManager fm;
 	public int enemyIndex;
 	public float alertnessStep = 100f;
 	private float alertnessMin = 0f;
@@ -52,9 +53,9 @@ public class EnemyBrain : MonoBehaviour {
 	}
 
 	void Update() {
+		Global.debugGUI("alertness E" + enemyIndex.ToString(), alertness);
 		alertnessDecay();
 		handleHighAlertReaction();
-		Global.debugGUI("ALERTSTATE E" + enemyIndex.ToString(), alertness);
 	}
 
 	void LateUpdate() {
@@ -65,7 +66,7 @@ public class EnemyBrain : MonoBehaviour {
 	// is called from a Sense script
 	public void senseTrigger(float fac) {
 		alertness += fac * Time.deltaTime;
-		if (alertness >= alertnessStep * (int)ALERTSTATE.ALERTNESS1 && alertState != ALERTSTATE.ALERTNESS2) {
+		if (alertness >= alertnessStep * (int)ALERTSTATE.ALERTNESS1 && alertState < ALERTSTATE.ALERTNESS1) {
 			alertnessMin = alertnessStep * (int)ALERTSTATE.ALERTNESS1;
 			alertState = ALERTSTATE.ALERTNESS1;
 		}
@@ -76,7 +77,7 @@ public class EnemyBrain : MonoBehaviour {
 	}
 
 	public void setMinAlertState(ALERTSTATE alState) {
-		if(alState >= alertState) {
+		if(alState > alertState) {
 			alertState = alState;
 			alertnessMin = alertnessStep * (int)alState;
 			alertness = alertnessMin;
@@ -87,7 +88,7 @@ public class EnemyBrain : MonoBehaviour {
 	void alertnessDecay() {
 		if (alertState != ALERTSTATE.ALERTNESS2) {
 			alertness -= baseAlertnessDecay * alertnessStep
-						 * ((int)ALERTSTATE.ALERTNESS2 / ((int)ALERTSTATE.ALERTNESS2 - (int)alertState)) * Time.deltaTime;
+						 * ((int)ALERTSTATE.ALERTNESS2 - (int)alertState) / (int)ALERTSTATE.ALERTNESS2 * Time.deltaTime;
 		}
 		if (alertness < alertnessMin) {
 			alertness = alertnessMin;
@@ -96,15 +97,22 @@ public class EnemyBrain : MonoBehaviour {
 
 	// handle the Enemies reaction when a high alert state is reached
 	void handleHighAlertReaction() {
-		if (alertState >= ALERTSTATE.ALERTNESS1) {
+		if (alertState == ALERTSTATE.ALERTNESS1) {
 			if (noticedPlayerIndex != -1) {
 				Vector3 triggerPos = Player.GetComponent<PlayerLocation>()
-										.PlayerArr[noticedPlayerIndex].position;
+											.PlayerArr[noticedPlayerIndex].position;
 				handleTrigger(triggerPos);
 				GetComponent<EnemyMessaging>().shout(triggerPos);
 			}
 
 		} else if (alertState == ALERTSTATE.ALERTNESS2) {
+			fm.joinFight(transform);
+			//just Debugging
+			if (fm.FightParticipants != null) {
+				for (int i = 0; i < fm.FightParticipants.Count; i++) {
+					Global.debugGUI("FightParticipant #" + i.ToString(), fm.FightParticipants[i]);
+				}
+			}
 			// FIGHT!
 			//SceneManager.LoadScene("fightInitiation");
 		}

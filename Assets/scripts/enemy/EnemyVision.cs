@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyVision : MonoBehaviour {
-	public float fovHor = 70;
-	public float fovVer	= 50;
-	public float distanceAcc = 0.2f;
-	public float intensityThreshhold = 15f;
-	public float regard = 150f; //factor of alertness-increase when this sense is trigered
+	[SerializeField] private float fovHor = 70;
+	[SerializeField] private float fovVer	= 50;
+	[SerializeField] private float distanceAcc = 0.2f;
+	[SerializeField] private float intensityThreshhold = 1f;
+	[SerializeField] private float nearDistanceRecognition = 4f;
+	[SerializeField] private float regard = 300f; //factor of alertness-increase when this sense is trigered
 	private Transform Self;
 	private Transform[] PlayerArr;
 
@@ -36,38 +37,23 @@ public class EnemyVision : MonoBehaviour {
 		for (int i = 0; i < PlayerArr.Length; i++) {
 			sensedIntensity[i] = noticedIntesity(PlayerArr[i]);
 			if(sensedIntensity[i] >= intensityThreshhold) {
-				noticedPlayer[i] = true;
 				if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
+					noticedPlayer[i] = true;
 					Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
 				}
 				Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity[i] / intensityThreshhold * regard);
+			} else if(sensedIntensity[i] < intensityThreshhold
+					  && (PlayerArr[i].position - transform.position).magnitude <= nearDistanceRecognition) {
+				if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
+					noticedPlayer[i] = true;
+					Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
+				}
+				// magic number to overcome virtualAlertnessDecayBug
+				Self.GetComponent<EnemyBrain>().senseTrigger(7000);
 			}
 		}
 		if (Self.GetComponent<EnemyBrain>().alertState >= EnemyBrain.ALERTSTATE.ALERTNESS1) {
 			Self.GetComponent<EnemyBrain>().sensedPlayerIndex(PlayerArr, noticedPlayer);
-		}
-	}
-
-	public void nonPlayerVisionTrigger(Vector3 pos, float intensity) {
-		float sensedIntensity = 0f;
-		float vertical = Global.angleInPlane(transform, pos, transform.right);
-		float horizontal = Global.angleInPlane(transform, pos, transform.up);
-		if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
-			RaycastHit hit;
-			if (Physics.Raycast(transform.position, pos - transform.position, out hit)) {
-				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
-					if((pos - transform.position).magnitude >= distanceAcc) {
-						if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
-							Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
-						}
-						// 1/distance^2 as an weight
-						sensedIntensity = intensity / Mathf.Pow((pos - transform.position).magnitude, 2);
-					}
-				}
-			}
-		}
-		if (sensedIntensity >= intensityThreshhold) {
-			Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity / intensityThreshhold * regard);
 		}
 	}
 
@@ -97,6 +83,30 @@ public class EnemyVision : MonoBehaviour {
 		}
 		return sensedIntensity;
 	}
+
+	public void nonPlayerVisionTrigger(Vector3 pos, float intensity) {
+		float sensedIntensity = 0f;
+		float vertical = Global.angleInPlane(transform, pos, transform.right);
+		float horizontal = Global.angleInPlane(transform, pos, transform.up);
+		if (vertical <= fovVer / 2 && horizontal <= fovHor / 2) {
+			RaycastHit hit;
+			if (Physics.Raycast(transform.position, pos - transform.position, out hit)) {
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) {
+					if((pos - transform.position).magnitude >= distanceAcc) {
+						if (EnemyBrain.SENSESTATE.SEEING >= Self.GetComponent<EnemyBrain>().senseState) {
+							Self.GetComponent<EnemyBrain>().senseState = EnemyBrain.SENSESTATE.SEEING;
+						}
+						// 1/distance^2 as an weight
+						sensedIntensity = intensity / Mathf.Pow((pos - transform.position).magnitude, 2);
+					}
+				}
+			}
+		}
+		if (sensedIntensity >= intensityThreshhold) {
+			Self.GetComponent<EnemyBrain>().senseTrigger(sensedIntensity / intensityThreshhold * regard);
+		}
+	}
+
 	// enables the ability to see the fov of the gameObject
 	void OnDrawGizmosSelected() {
 		float viewRange = 15f;

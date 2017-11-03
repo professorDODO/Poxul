@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Global : MonoBehaviour {
-
+	
 	// counts active childs
 	public static int activeChildCount(Transform GO) {
 		int childCount = 0;

@@ -4,6 +4,8 @@ using UnityEngine;
 using XboxCtrlrInput;
 
 public class Input : MonoBehaviour {
+
+	[HideInInspector] public bool freeze;
 	
 	private int playerIndex = 1;
 	private Movement Movement;
@@ -27,7 +29,8 @@ public class Input : MonoBehaviour {
 			Movement.jumpStates = Movement.JUMPSTATES.JUMPPREP;
 			Movement.jumpPreparation ();
 		}
-		if (XCI.GetButtonUp (XboxButton.A, (XboxController)playerIndex)) {
+		if (XCI.GetButtonUp (XboxButton.A, (XboxController)playerIndex)
+			&& Movement.jumpStates != Movement.JUMPSTATES.JUMPING) {
 			Movement.jumpStates = Movement.JUMPSTATES.LAUNCH;
 		}
 		if (XCI.GetButton(XboxButton.Y, (XboxController)playerIndex)) {
@@ -36,13 +39,15 @@ public class Input : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
-		if (Movement.jumpStates != Movement.JUMPSTATES.JUMPING) {
-			Movement.move (inputVec, true);
-			Movement.rotate (inputVec, true);
+		if(!freeze){
+			if(Movement.jumpStates != Movement.JUMPSTATES.JUMPING){
+				Movement.move(inputVec,true);
+				Movement.rotate(inputVec,true);
+			}
+			if(Movement.jumpStates == Movement.JUMPSTATES.LAUNCH){
+				Movement.jump();
+			}
+			Movement.movementDebug();
 		}
-		if (Movement.jumpStates == Movement.JUMPSTATES.LAUNCH) {
-			Movement.jump();
-		}
-		Movement.movementDebug();
 	}
 }

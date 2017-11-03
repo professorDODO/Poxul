@@ -2,32 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FreezePlayer : MonoBehaviour {
+public class FreezePlayer : Freeze, FreezeInstances{
 
-	public GameObject fmObj;
-	FightManager fmScr;
-
-	Rigidbody rb;
-
-	Vector3 lastVelo;
-	Vector3 lastAngVelo;
+	Input inScr;
 
 	// Use this for initialization
 	void Start () {
-		fmScr = fmObj.GetComponent<FightManager>();
-		fmScr.fPlayer.Add(this);
-		rb = GetComponent<Rigidbody> ();
-	}
-	
-	public void Freeze(){
-		lastVelo = rb.velocity;
-		lastAngVelo = rb.angularVelocity;
-		rb.isKinematic = true;
+		inScr = this.GetComponent<Input>();
+		InitFreeze(this);
 	}
 
-	public void Unfreeze(){
-		rb.isKinematic = false;
-		rb.velocity = lastVelo;
-		rb.angularVelocity = lastAngVelo;
+	public override void SpecialFreeze(){
+		inScr.freeze = true;
+	}
+
+	public override void SpecialUnfreeze(){
+		inScr.freeze = false;
 	}
 }
